@@ -16,7 +16,7 @@
 /* initializes a sblas_svec structure */
 int sblas_initsvec(sblas_svec *V, int m)
 {
-  if (V == NULL) return INPUT_ERROR;
+  if (V == NULL) return sb_INPUT_ERROR;
   
   V->m = m;
   V->nZ = 0;
@@ -24,7 +24,7 @@ int sblas_initsvec(sblas_svec *V, int m)
   V->index = NULL;
   V->val = NULL;
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_createsvec */
@@ -35,12 +35,12 @@ int sblas_createsvec(sblas_svec **pV, int m)
   
   //allocate and initialize the vector
   if (((*pV) = malloc(sizeof(sblas_svec))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   
   ierr = sblas_error(sblas_initsvec((*pV), m));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_initsmat */
@@ -48,26 +48,26 @@ int sblas_createsvec(sblas_svec **pV, int m)
 int sblas_initsmat(sblas_smat *M, int m, int n)
 {
   int ierr, i;
-  if (M == NULL) return INPUT_ERROR;
+  if (M == NULL) return sb_INPUT_ERROR;
   
   M->m = m;
   M->n = n;
   M->nZ = 0;
   //init rows and collumns
   if ((M->Row = malloc(M->m*sizeof(sblas_svec))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   for (i = 0; i < M->m; i++) {
     ierr = sblas_error(sblas_createsvec(&(M->Row[i]), n));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
   }
   if ((M->Col = malloc(M->n*sizeof(sblas_svec))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   for (i = 0; i < M->n; i++) {
     ierr = sblas_error(sblas_createsvec(&(M->Col[i]), m));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_createsmat */
@@ -78,12 +78,12 @@ int sblas_createsmat(sblas_smat **pM, int m, int n)
   
   //allocate and initialize the matrix
   if (((*pM) = malloc(sizeof(sblas_smat))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   
   ierr = sblas_error(sblas_initsmat((*pM), m, n));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_destroysvec */
@@ -122,11 +122,11 @@ int sblas_svec2dvec(sblas_svec *V, double **pdV)
   int i, z;
   
   if (V == NULL)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   //allocate array
   if (((*pdV) = malloc(V->m*sizeof(double))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   
   z = 0;
   for (i = 0; i < V->m; i++){
@@ -138,7 +138,7 @@ int sblas_svec2dvec(sblas_svec *V, double **pdV)
       (*pdV)[i] = 0.0;
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_svecentry */
@@ -149,11 +149,11 @@ int sblas_svecentry(sblas_svec *V, int index,
   int z, dest, src, movesize, rank;
   
   if (V == NULL)
-    return sblas_error(INPUT_ERROR);
+    return sblas_error(sb_INPUT_ERROR);
   
   //return immediately if value is machine zero
   if (fabs(value) <= MEPS)
-    return OK;
+    return sb_OK;
   
   //change size if necessary
   if (index > V->m)
@@ -166,10 +166,10 @@ int sblas_svecentry(sblas_svec *V, int index,
       V->nZprealloc = V->nZ;
       if((V->index = realloc(V->index, V->nZprealloc
                              *sizeof(int))) == NULL)
-        return sblas_error(MEMORY_ERROR);
+        return sblas_error(sb_MEMORY_ERROR);
       if((V->val = realloc(V->val, V->nZprealloc
                            *sizeof(double))) == NULL)
-        return sblas_error(MEMORY_ERROR);
+        return sblas_error(sb_MEMORY_ERROR);
     }
     V->index[0] = index;
     V->val[0] = value;
@@ -177,17 +177,17 @@ int sblas_svecentry(sblas_svec *V, int index,
   else{
     /* is it a new entry */
     if ((z = sblas_bsearch(index, V->index, 0, 
-                           V->nZ-1, &rank)) == NOT_FOUND){
+                           V->nZ-1, &rank)) == sb_NOT_FOUND){
       /* make sure that there is enough space in the 
        arrays for the new entry */
       if (V->nZ+1 > V->nZprealloc){
         V->nZprealloc = V->nZ+1;
         if((V->index = realloc(V->index, V->nZprealloc
                                *sizeof(int))) == NULL)
-          return sblas_error(MEMORY_ERROR);
+          return sblas_error(sb_MEMORY_ERROR);
         if((V->val = realloc(V->val, V->nZprealloc
                              *sizeof(double))) == NULL)
-          return sblas_error(MEMORY_ERROR);
+          return sblas_error(sb_MEMORY_ERROR);
       }
       //make sure to keep the crescent order
       if (rank == V->nZ){
@@ -209,10 +209,10 @@ int sblas_svecentry(sblas_svec *V, int index,
       if (movesize > 0){
         if (memmove(V->index+dest,V->index+src,
                     movesize*sizeof(int)) == NULL)
-          return sblas_error(MEMORY_ERROR);
+          return sblas_error(sb_MEMORY_ERROR);
         if (memmove(V->val+dest,V->val+src,
                     movesize*sizeof(double)) == NULL)
-          return sblas_error(MEMORY_ERROR);
+          return sblas_error(sb_MEMORY_ERROR);
       }
       V->index[rank] = index;
       V->val[rank] = value;
@@ -227,16 +227,16 @@ int sblas_svecentry(sblas_svec *V, int index,
         movesize = V->nZ-src;
         if (memmove(V->index+dest,V->index+src,
                     movesize*sizeof(int)) == NULL)
-          return sblas_error(MEMORY_ERROR);
+          return sblas_error(sb_MEMORY_ERROR);
         if (memmove(V->val+dest,V->val+src,
                     movesize*sizeof(double)) == NULL)
-          return sblas_error(MEMORY_ERROR);
+          return sblas_error(sb_MEMORY_ERROR);
         V->nZ--;        
       }
     }
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_smatentry */
@@ -247,27 +247,27 @@ int sblas_smatentry(sblas_smat *M, int row,
   int ierr;
   
   if (M == NULL)
-    return sblas_error(INPUT_ERROR);
+    return sblas_error(sb_INPUT_ERROR);
   
   //return immediately if value is machine zero
   if (fabs(value) <= MEPS)
-    return OK;
+    return sb_OK;
   
   //check range
   if (row > M->m || col > M->n)
-    return sblas_error(OUT_OF_BOUNDS);
+    return sblas_error(sb_OUT_OF_BOUNDS);
   
   //store nz before and then add the new nz for the row
   M->nZ -= M->Row[row-1]->nZ;
   
   ierr = sblas_error(sblas_svecentry(M->Row[row-1], col, value));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   M->nZ += M->Row[row-1]->nZ;
   
   ierr = sblas_error(sblas_svecentry(M->Col[col-1], row, value));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
-  return OK;
+  return sb_OK;
 }
 

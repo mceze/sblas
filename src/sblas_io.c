@@ -15,7 +15,7 @@
  the error happened*/
 int sblas_er( char *file, int line, char *call, int ierr)
 {
-  if (ierr == OK) return OK;
+  if (ierr == sb_OK) return sb_OK;
   printf("**************Error: %d**************",ierr);
   printf("\nFile: %s\nLine: %d\nCall: %s\n",
          file, line, call);
@@ -36,7 +36,7 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
   
   //scroll through file and count the number of entries
   if ((fid = fopen(filename, "r")) == NULL)
-    return sblas_error(READWRITE_ERROR);
+    return sblas_error(sb_READWRITE_ERROR);
   
   i = 0;
   nI = 0;
@@ -49,7 +49,7 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
         if (i == 0)
           ref = col;
         else if (col != ref)//input is not a vector
-          return sblas_error(INPUT_ERROR);
+          return sblas_error(sb_INPUT_ERROR);
         //number of rows in the vector is the maximum index
         if (row > nI)
           nI = row;
@@ -59,7 +59,7 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
   
   //create vector
   ierr = sblas_error(sblas_createsvec(&V,nI));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   rewind(fid);
   while (!feof(fid)) {
@@ -69,7 +69,7 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
         sscanf(buf, "%d %d %lf",&row, &col, &value);
         
         ierr = sblas_error(sblas_svecentry(V, row, value));
-        if (ierr != OK) return ierr;
+        if (ierr != sb_OK) return ierr;
       }
   }
   
@@ -77,7 +77,7 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
   
   fclose(fid);
   
-  return OK;
+  return sb_OK;
   
 }
 
@@ -94,7 +94,7 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
   
   //scroll through file and count the number of entries
   if ((fid = fopen(filename, "r")) == NULL)
-    return sblas_error(READWRITE_ERROR);
+    return sblas_error(sb_READWRITE_ERROR);
   
   ncol = nrow = 0;
   while (!feof(fid)) {
@@ -111,7 +111,7 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
   
   //create matrix
   ierr = sblas_error(sblas_createsmat(&M, nrow, ncol));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   rewind(fid);
   while (!feof(fid)) {
@@ -121,7 +121,7 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
         
         ierr = sblas_error(sblas_smatentry(M, row, 
                                            col, value));
-        if (ierr != OK) return ierr;
+        if (ierr != sb_OK) return ierr;
       }
   }
   
@@ -129,7 +129,7 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
   
   fclose(fid);
   
-  return OK;
+  return sb_OK;
   
 }
 
@@ -141,19 +141,19 @@ int sblas_writesvecascii(char *filename, sblas_svec *V)
   FILE *fid;
   
   if ((fid = fopen(filename, "w")) == NULL)
-    return sblas_error(READWRITE_ERROR);
+    return sblas_error(sb_READWRITE_ERROR);
   //print header
   ierr = fprintf(fid,"%d %d\n", 1, V->m);
-  if (ierr < OK) return sblas_error(READWRITE_ERROR);
+  if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
   for (i = 0; i < V->nZ; i++){
     ierr = fprintf(fid,"%d %1.15e\n", V->index[i],V->val[i]);
-    if (ierr < OK) return sblas_error(READWRITE_ERROR);
+    if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   }
   ierr = fclose(fid);
-  if (ierr != OK) return sblas_error(READWRITE_ERROR);
+  if (ierr != sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
-  return OK;
+  return sb_OK;
 }
 
 
@@ -165,22 +165,22 @@ int sblas_writesmatascii(char *filename, sblas_smat *M)
   FILE *fid;
   
   if ((fid = fopen(filename, "w")) == NULL)
-    return sblas_error(READWRITE_ERROR);
+    return sblas_error(sb_READWRITE_ERROR);
   //print header
   ierr = fprintf(fid,"%d %d %d %d\n", 1, M->m, 1, M->n);
-  if (ierr < OK) return sblas_error(READWRITE_ERROR);
+  if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
   for (i = 0; i < M->m; i++)
     for (j = 0; j < M->Row[i]->nZ; j++){
       ierr = fprintf(fid,"%d %d %1.15e\n",  
                      i+1, M->Row[i]->index[j],
                      M->Row[i]->val[j]);
-      if (ierr < OK) return sblas_error(READWRITE_ERROR);
+      if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
     }
   ierr = fclose(fid);
-  if (ierr != OK) return sblas_error(READWRITE_ERROR);
+  if (ierr != sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
-  return OK;
+  return sb_OK;
 }
 
 

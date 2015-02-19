@@ -19,7 +19,7 @@ int sblas_bsearch(const int target, const int *set,
   int size;
   
   if (end < begin)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   size = end-begin+1;
   if (size == 1){
@@ -35,7 +35,7 @@ int sblas_bsearch(const int target, const int *set,
         else
           (*rank) = end+1;
       }
-      return NOT_FOUND;
+      return sb_NOT_FOUND;
     }
   }
   if (target == set[begin]){
@@ -54,12 +54,12 @@ int sblas_bsearch(const int target, const int *set,
   if (target > set[end]){
     if (rank != NULL)
       (*rank) = end+1;
-    index = NOT_FOUND;
+    index = sb_NOT_FOUND;
   }
   else if (target < set[begin]){
     if (rank != NULL)
       (*rank) = begin-1;
-    index = NOT_FOUND;
+    index = sb_NOT_FOUND;
   }
   else{
     while (size > 1){
@@ -79,7 +79,7 @@ int sblas_bsearch(const int target, const int *set,
         (*rank) = begin;
     }
     else{
-      index = NOT_FOUND;
+      index = sb_NOT_FOUND;
       if (target > set[begin]){
         if (rank != NULL)
           (*rank) = begin+1;
