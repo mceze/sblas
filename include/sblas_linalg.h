@@ -47,4 +47,8 @@ int sblas_smpm(double a, sblas_smat *A,
 /* set b = a*/
 int sblas_cpvec(sblas_svec *a, sblas_svec **pb);
 
+/* function: sblas_zerovec */
+/* set a(i) = 0.0*/
+int sblas_zerovec(sblas_svec *a);
+
 #endif

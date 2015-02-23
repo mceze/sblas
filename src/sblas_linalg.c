@@ -342,19 +342,28 @@ int sblas_cpvec(sblas_svec *a, sblas_svec **pb)
   sblas_svec *b;
   
   ierr = sblas_error(sblas_createsvec(&b, a->m));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   b->nZ = a->nZ;
-  b->nZprealloc = b->nZprealloc;
+  b->nZprealloc = a->nZprealloc;
   
   if ((b->index = malloc(b->nZprealloc*sizeof(int))) == NULL)
-    return MEMORY_ERROR;
-  memcpy(b->index, a->index, a->nZprealloc*sizeof(int));
+    return sb_OK;
+  memcpy(b->index+0, a->index+0, a->nZprealloc*sizeof(int));
   if ((b->val = malloc(b->nZprealloc*sizeof(double))) == NULL)
-    return MEMORY_ERROR;
-  memcpy(b->val, a->val, a->nZprealloc*sizeof(double));
+    return sb_OK;
+  memcpy(b->val+0, a->val+0, a->nZprealloc*sizeof(double));
   
   (*pb) = b;
   
-  return OK;
+  return sb_OK;
+}
+
+/* function: sblas_zerovec */
+/* set a(i) = 0.0*/
+int sblas_zerovec(sblas_svec *a)
+{
+  int i;
+  for (i = 0;i < a->nZprealloc;i++)a->val[i] = 0.0;
+  return sb_OK;
 }
