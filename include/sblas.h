@@ -18,5 +18,6 @@
 #include "sblas_struct.h"
 #include "sblas_utils.h"
 #include "sblas_linalg.h"
+#include "sblas_linsolv.h"
 
 #endif

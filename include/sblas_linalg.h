@@ -43,4 +43,8 @@ int sblas_smpm(double a, sblas_smat *A,
                sblas_smat *B, enum sblas_bool TrB,
                sblas_smat **pC);
 
+/* function: sblas_cpvec */
+/* set b = a*/
+int sblas_cpvec(sblas_svec *a, sblas_svec **pb);
+
 #endif

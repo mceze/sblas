@@ -333,3 +333,28 @@ int sblas_smpm(double a, sblas_smat *A,
   
   return OK;
 }
+
+/* function: sblas_cpvec */
+/* set b = a*/
+int sblas_cpvec(sblas_svec *a, sblas_svec **pb)
+{
+  int ierr;
+  sblas_svec *b;
+  
+  ierr = sblas_error(sblas_createsvec(&b, a->m));
+  if (ierr != OK) return ierr;
+  
+  b->nZ = a->nZ;
+  b->nZprealloc = b->nZprealloc;
+  
+  if ((b->index = malloc(b->nZprealloc*sizeof(int))) == NULL)
+    return MEMORY_ERROR;
+  memcpy(b->index, a->index, a->nZprealloc*sizeof(int));
+  if ((b->val = malloc(b->nZprealloc*sizeof(double))) == NULL)
+    return MEMORY_ERROR;
+  memcpy(b->val, a->val, a->nZprealloc*sizeof(double));
+  
+  (*pb) = b;
+  
+  return OK;
+}
