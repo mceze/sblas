@@ -33,14 +33,14 @@
 #define sblas_error(X) (sblas_er( __FILE__, __LINE__, #X, (X)))
 
 /* Error codes */
-#define OK               0
-#define READWRITE_ERROR -1
-#define INCONSISTENCY   -2
-#define INPUT_ERROR     -3
-#define INCOMPATIBLE    -4
-#define MEMORY_ERROR    -5
-#define NOT_FOUND       -6
-#define OUT_OF_BOUNDS   -7
+#define sb_OK               0
+#define sb_READWRITE_ERROR -1
+#define sb_INCONSISTENCY   -2
+#define sb_INPUT_ERROR     -3
+#define sb_INCOMPATIBLE    -4
+#define sb_MEMORY_ERROR    -5
+#define sb_NOT_FOUND       -6
+#define sb_OUT_OF_BOUNDS   -7
 
 
 

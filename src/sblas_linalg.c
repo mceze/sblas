@@ -25,10 +25,10 @@ int sblas_svdv(double alpha, sblas_svec *Va,
   sblas_svec *Vl, *Vr;
   
   if (Va == NULL || Vb == NULL)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   if (Va->m != Vb->m)
-    return INCOMPATIBLE;
+    return sb_INCOMPATIBLE;
   
   //use the "sparsest" as reference
   if (Va->nZ <= Vb->nZ){
@@ -58,30 +58,30 @@ int sblas_svdv(double alpha, sblas_svec *Va,
       //check overlap
       if (Vl->index[top_i] > Vr->index[end]||
           Vl->index[bot_i] < Vr->index[begin])
-        return OK;    
+        return sb_OK;    
       //look at top
       if (begin > end)
-        return OK;
+        return sb_OK;
       indr = sblas_bsearch(Vl->index[top_i], Vr->index, 
                            begin, end, &rank);
       if (indr >= 0){
         begin = rank+1; 
         value[0] += alpha*Vl->val[top_i]*Vr->val[indr];
       }
-      else if (indr != NOT_FOUND)
+      else if (indr != sb_NOT_FOUND)
         return sblas_error(indr);
       z++;
       //look at bottom
       if (bot_i != top_i){
         if (begin > end)
-          return OK;
+          return sb_OK;
         indr = sblas_bsearch(Vl->index[bot_i], Vr->index, 
                              begin, end, &rank);
         if (indr >= 0){
           end = rank-1; 
           value[0] += alpha*Vl->val[bot_i]*Vr->val[indr];
         }
-        else if (indr != NOT_FOUND)
+        else if (indr != sb_NOT_FOUND)
           return sblas_error(indr);
         z++;
       }
@@ -91,7 +91,7 @@ int sblas_svdv(double alpha, sblas_svec *Va,
     }
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_smxv */
@@ -105,7 +105,7 @@ int sblas_smxv(double alpha, sblas_smat *A,
   sblas_svec **Row;
   
   if (A == NULL || b == NULL)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   if (TrA){
     m = A->n;
@@ -119,20 +119,20 @@ int sblas_smxv(double alpha, sblas_smat *A,
   }
   
   if (n != b->m)
-    return INCOMPATIBLE;
+    return sb_INCOMPATIBLE;
   //create rhs
   ierr = sblas_error(sblas_createsvec(pc, m));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   for (i = 0; i < m; i++){
     ierr = sblas_error(sblas_svdv(alpha, Row[i], b, &val));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
     
     ierr = sblas_error(sblas_svecentry(pc[0], i+1, val));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_smxm */
@@ -146,7 +146,7 @@ int sblas_smxm(double alpha, sblas_smat *A,
   sblas_svec **Row, **Col;
   
   if (A == NULL || B == NULL)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   if (TrA){
     mA = A->n;
@@ -171,24 +171,24 @@ int sblas_smxm(double alpha, sblas_smat *A,
   }
   
   if (nA != mB)
-    return INCOMPATIBLE;
+    return sb_INCOMPATIBLE;
   
   ierr = sblas_error(sblas_createsmat(pC, mA, nB));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   for (i = 0; i < mA; i++){
     for (j = 0; j < nB; j++){
       ierr = sblas_error(sblas_svdv(alpha, Row[i], 
                                     Col[j], &val));
-      if (ierr != OK) return ierr;
+      if (ierr != sb_OK) return ierr;
       
       ierr = sblas_error(sblas_smatentry(pC[0], i+1, 
                                          j+1, val));
-      if (ierr != OK) return ierr;
+      if (ierr != sb_OK) return ierr;
     }
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_svpv */
@@ -201,10 +201,10 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
   sblas_svec *Vl, *Vr;
   
   if (Va == NULL || Vb == NULL)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   if (Va->m != Vb->m)
-    return INCOMPATIBLE;
+    return sb_INCOMPATIBLE;
   
   if (Va->nZ <= Vb->nZ){
     Vl = Va;
@@ -220,28 +220,28 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
   }
   
   ierr = sblas_error(sblas_createsvec(pVc, Va->m));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   for (z = 0; z < Vl->nZ; z++){
     ierr = sblas_error(sblas_svecentry(pVc[0], 
                                        Vl->index[z], 
                                        al*Vl->val[z]));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
     
     ierr = sblas_error(sblas_svecentry(pVc[0], 
                                        Vr->index[z], 
                                        ar*Vr->val[z]));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
   }
   
   for (z = Vl->nZ; z < Vr->nZ; z++){
     ierr = sblas_error(sblas_svecentry(pVc[0], 
                                        Vr->index[z], 
                                        ar*Vr->val[z]));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
   }
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_smpm */
@@ -255,12 +255,12 @@ int sblas_smpm(double a, sblas_smat *A,
   sblas_smat *Ma, *Mb, *C;
   
   if (A == NULL || B == NULL)
-    return INPUT_ERROR;
+    return sb_INPUT_ERROR;
   
   if ((Ma = malloc(sizeof(sblas_smat))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   if ((Mb = malloc(sizeof(sblas_smat))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   
   if (TrA){
     Ma->m = A->n;
@@ -293,24 +293,24 @@ int sblas_smpm(double a, sblas_smat *A,
   
   if (Ma->m != Mb->m || 
       Ma->n != Mb->n)
-    return INCOMPATIBLE;
+    return sb_INCOMPATIBLE;
   
   if ((C = malloc(sizeof(sblas_smat))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   C->m = Ma->m;
   C->n = Ma->n;
   C->nZ = 0;
   if ((C->Row = malloc(C->m*sizeof(sblas_svec))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   if ((C->Col = malloc(C->n*sizeof(sblas_svec))) == NULL)
-    return MEMORY_ERROR;
+    return sb_MEMORY_ERROR;
   
   //add rows
   for (i = 0; i < Ma->m; i++){
     ierr = sblas_error(sblas_svpv(a, Ma->Row[i], 
                                   b, Mb->Row[i], 
                                   &C->Row[i]));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
     C->nZ += C->Row[i]->nZ;
   }
   //add cols
@@ -318,7 +318,7 @@ int sblas_smpm(double a, sblas_smat *A,
     ierr = sblas_error(sblas_svpv(a, Ma->Col[i], 
                                   b, Mb->Col[i], 
                                   &C->Col[i]));
-    if (ierr != OK) return ierr;
+    if (ierr != sb_OK) return ierr;
   }
   
   pC[0] = C;
@@ -331,7 +331,7 @@ int sblas_smpm(double a, sblas_smat *A,
   free(Ma);
   free(Mb);
   
-  return OK;
+  return sb_OK;
 }
 
 /* function: sblas_cpvec */

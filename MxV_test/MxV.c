@@ -20,32 +20,32 @@ int main()
   sblas_svec *V, *B=NULL, *x;
   
   ierr = sblas_error(sblas_readsmat("A.txt", &A));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   ierr = sblas_error(sblas_readsvec("R.txt", &V));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   s = clock();
   //Matrix vector product
   ierr = sblas_error(sblas_smxv(1.0, A, True, V, &B));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   e = clock();
   printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);
   
   
   ierr = sblas_error(sblas_smxm(1.0, A, True, A, True, &H));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   ierr = sblas_error(sblas_cpvec(B, &x));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   ierr = sblas_error(sblas_conjgrad(H, B, x, 1e-3, 100));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   
   //write vector out
   ierr = sblas_error(sblas_writesvecascii("x.txt", x));
-  if (ierr != OK) return ierr;
+  if (ierr != sb_OK) return ierr;
   
   
   sblas_destroysmat(A);
@@ -55,5 +55,5 @@ int main()
   sblas_destroysvec(x);
   
   
-  return OK;
+  return sb_OK;
 }
