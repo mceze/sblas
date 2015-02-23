@@ -16,8 +16,8 @@ int main()
 {
   int ierr;
   double s,e;
-  sblas_smat *A;
-  sblas_svec *V, *B=NULL;
+  sblas_smat *A, *H;
+  sblas_svec *V, *B=NULL, *x;
   
   ierr = sblas_error(sblas_readsmat("A.txt", &A));
   if (ierr != OK) return ierr;
@@ -32,14 +32,28 @@ int main()
   e = clock();
   printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);
   
+  
+  ierr = sblas_error(sblas_smxm(1.0, A, True, A, True, &H));
+  if (ierr != OK) return ierr;
+  
+  ierr = sblas_error(sblas_cpvec(B, &x));
+  if (ierr != OK) return ierr;
+  
+  ierr = sblas_error(sblas_conjgrad(H, B, x, 1e-3, 100));
+  if (ierr != OK) return ierr;
+  
+  
   //write vector out
-  ierr = sblas_error(sblas_writesvecascii("b.txt", B));
+  ierr = sblas_error(sblas_writesvecascii("x.txt", x));
   if (ierr != OK) return ierr;
   
   
   sblas_destroysmat(A);
+  sblas_destroysmat(H);
   sblas_destroysvec(V);
   sblas_destroysvec(B);
+  sblas_destroysvec(x);
+  
   
   return OK;
 }
