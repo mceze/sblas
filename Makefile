@@ -12,6 +12,7 @@ LIBS = -lm
 OBJLIST = $(SRCDIR)/sblas_io.o \
           $(SRCDIR)/sblas_linalg.o \
           $(SRCDIR)/sblas_utils.o \
+          $(SRCDIR)/sblas_linsolv.o \
           $(SRCDIR)/sblas_aux.o
 
 DEPS = $(INCDIR)/%.h
