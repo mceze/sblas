@@ -146,7 +146,7 @@ int sblas_svec2dvec(sblas_svec *V, double **pdV)
 int sblas_svecentry(sblas_svec *V, int index, 
                     double value)
 {
-  int z, dest, src, movesize, rank;
+  int z, dest = 0, src = 0, movesize, rank;
   
   if (V == NULL)
     return sblas_error(sb_INPUT_ERROR);

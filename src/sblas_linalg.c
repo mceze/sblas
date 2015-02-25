@@ -360,10 +360,48 @@ int sblas_cpvec(sblas_svec *a, sblas_svec **pb)
 }
 
 /* function: sblas_zerovec */
-/* set a(i) = 0.0*/
-int sblas_zerovec(sblas_svec *a)
+/* set Va(i) = 0.0*/
+int sblas_zerovec(sblas_svec *Va)
 {
   int i;
-  for (i = 0;i < a->nZprealloc;i++)a->val[i] = 0.0;
+  for (i = 0;i < Va->nZprealloc;i++)Va->val[i] = 0.0;
+  Va->nZ = 0;
+  
   return sb_OK;
 }
+
+/* function: sblas_scalevec */
+/* set Va *= a */
+int sblas_scalevec(sblas_svec *Va, double a)
+{
+  int i;
+  if (a <= MEPS) return sblas_error(sblas_zerovec(Va));
+  for (i = 0;i < Va->nZ;i++)Va->val[i] *= a;
+  
+  return sb_OK;
+}
+
+/* function: sblas_svadd */
+/* sets Vb = b*Vb + a*Va */
+int sblas_svadd(double a, sblas_svec *Va, double b, sblas_svec *Vb)
+{
+  int ierr, i, idx;
+  double val;
+  
+  if (Va->m != Vb->m) return sblas_error(sb_INCOMPATIBLE);
+  
+  ierr = sblas_error(sblas_scalevec(Vb, b));
+  if (ierr != sb_OK) return ierr;
+  
+  for (i = 0; i < Va->nZ; i++) {
+    idx = Va->index[i];
+    val = a*Va->val[i];
+    ierr = sblas_error(sblas_svecentry(Vb, idx, val));
+    if (ierr != sb_OK) return ierr;
+  }
+  
+  return sb_OK;
+}
+
+
+
