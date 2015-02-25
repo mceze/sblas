@@ -9,9 +9,10 @@
 #include "sblas.h"
 
 /* function: sblas_conjgrad */
-/* sparse matrix-vector product: Axb=c*/
+/* Solves A*x = b, with A symmetric, positive definite*/
 int sblas_conjgrad(sblas_smat *A, sblas_svec *b,
-                   sblas_svec *x, float const tol, int const niter)
+                   sblas_svec *x, float const tol,
+                   int const niter)
 {
   int ierr, it;
   double alpha, beta, den, num, r0;
