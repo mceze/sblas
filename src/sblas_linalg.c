@@ -95,10 +95,11 @@ int sblas_svdv(double alpha, sblas_svec *Va,
 }
 
 /* function: sblas_smxv */
-/* sparse matrix-vector product: Axb=c*/
-int sblas_smxv(double alpha, sblas_smat *A, 
-               enum sblas_bool TrA, 
-               sblas_svec *b, sblas_svec **pc)
+/* sparse matrix-vector product: A*b=c
+ if Alloc = True, a new vector c is created */
+int sblas_smxv(double alpha, sblas_smat *A,
+               enum sblas_bool TrA,sblas_svec *b,
+               sblas_svec **pc, enum sblas_bool Alloc)
 {
   int ierr, i, m, n;
   double val;
@@ -119,10 +120,14 @@ int sblas_smxv(double alpha, sblas_smat *A,
   }
   
   if (n != b->m)
-    return sb_INCOMPATIBLE;
-  //create rhs
-  ierr = sblas_error(sblas_createsvec(pc, m));
-  if (ierr != sb_OK) return ierr;
+    return sblas_error(sb_INCOMPATIBLE);
+  if (Alloc){
+    //create rhs
+    ierr = sblas_error(sblas_createsvec(pc, m));
+    if (ierr != sb_OK) return ierr;
+  }
+  else if (pc[0]->m != b->m)
+    return sblas_error(sb_INCOMPATIBLE);
   
   for (i = 0; i < m; i++){
     ierr = sblas_error(sblas_svdv(alpha, Row[i], b, &val));
@@ -136,7 +141,7 @@ int sblas_smxv(double alpha, sblas_smat *A,
 }
 
 /* function: sblas_smxm */
-/* sparse matrix-matrix product: op(A)xop(B)=C*/
+/* sparse matrix-matrix product: op(A)*op(B)=C*/
 int sblas_smxm(double alpha, sblas_smat *A, 
                enum sblas_bool TrA, sblas_smat *B, 
                enum sblas_bool TrB, sblas_smat **pC)
@@ -402,6 +407,4 @@ int sblas_svadd(double a, sblas_svec *Va, double b, sblas_svec *Vb)
   
   return sb_OK;
 }
-
-
 

@@ -20,10 +20,11 @@ int sblas_svdv(double alpha, sblas_svec *Va,
               sblas_svec *Vb, double *value);
 
 /* function: sblas_smxv */
-/* sparse matrix-vector product: op(A)xb=c*/
-int sblas_smxv(double alpha, sblas_smat *A, 
-               enum sblas_bool TrA, 
-               sblas_svec *b, sblas_svec **pc);
+/* sparse matrix-vector product: A*b=c
+ if Alloc = True, a new vector c is created */
+int sblas_smxv(double alpha, sblas_smat *A,
+               enum sblas_bool TrA,sblas_svec *b,
+               sblas_svec **pc, enum sblas_bool Alloc);
 
 /* function: sblas_smxm */
 /* sparse matrix-matrix product: op(A)xop(B)=C*/
@@ -54,6 +55,11 @@ int sblas_zerovec(sblas_svec *Va);
 /* function: sblas_scalevec */
 /* set Va *= a */
 int sblas_scalevec(sblas_svec *Va, double a);
+
+/* function: sblas_svadd */
+/* sets Vb = b*Vb + a*Va */
+int sblas_svadd(double a, sblas_svec *Va, double b,
+                sblas_svec *Vb);
 
 #endif
 
