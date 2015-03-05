@@ -68,7 +68,7 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
         //store ordered
         sscanf(buf, "%d %d %lf",&row, &col, &value);
         
-        ierr = sblas_error(sblas_svecentry(V, row, value));
+        ierr = sblas_error(sblas_svecentry(V, row-1, value));
         if (ierr != sb_OK) return ierr;
       }
   }
@@ -119,8 +119,8 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
       if (strncmp(buf, "\%", 1) != 0){
         sscanf(buf, "%d %d %lf",&row, &col, &value);
         
-        ierr = sblas_error(sblas_smatentry(M, row, 
-                                           col, value));
+        ierr = sblas_error(sblas_smatentry(M, row-1,
+                                           col-1, value));
         if (ierr != sb_OK) return ierr;
       }
   }
@@ -134,7 +134,7 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
 }
 
 /* function: sblas_writesvecascii */
-/* writes out a sparse vector in HYPRE format */
+/* writes out a sparse vector in ijv format */
 int sblas_writesvecascii(char *filename, sblas_svec *V)
 {
   int ierr, i;
@@ -143,11 +143,11 @@ int sblas_writesvecascii(char *filename, sblas_svec *V)
   if ((fid = fopen(filename, "w")) == NULL)
     return sblas_error(sb_READWRITE_ERROR);
   //print header
-  ierr = fprintf(fid,"%d %d\n", 1, V->m);
+  ierr = fprintf(fid,"%% %d %d\n", 1, V->m);
   if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
   for (i = 0; i < V->nZ; i++){
-    ierr = fprintf(fid,"%d %1.15e\n", V->index[i],V->val[i]);
+    ierr = fprintf(fid,"%d 1 %1.15e\n", V->index[i]+1,V->val[i]);
     if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   }
   ierr = fclose(fid);
@@ -158,7 +158,7 @@ int sblas_writesvecascii(char *filename, sblas_svec *V)
 
 
 /* function: sblas_writesmatascii */
-/* writes out a sparse matrix in HYPRE format */
+/* writes out a sparse matrix in ijv format */
 int sblas_writesmatascii(char *filename, sblas_smat *M)
 {
   int ierr, i, j;
@@ -167,13 +167,13 @@ int sblas_writesmatascii(char *filename, sblas_smat *M)
   if ((fid = fopen(filename, "w")) == NULL)
     return sblas_error(sb_READWRITE_ERROR);
   //print header
-  ierr = fprintf(fid,"%d %d %d %d\n", 1, M->m, 1, M->n);
+  ierr = fprintf(fid,"%% %d %d\n", M->m, M->n);
   if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
   for (i = 0; i < M->m; i++)
     for (j = 0; j < M->Row[i]->nZ; j++){
       ierr = fprintf(fid,"%d %d %1.15e\n",  
-                     i+1, M->Row[i]->index[j],
+                     i+1, M->Row[i]->index[j]+1,
                      M->Row[i]->val[j]);
       if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
     }

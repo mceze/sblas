@@ -133,7 +133,7 @@ int sblas_smxv(double alpha, sblas_smat *A,
     ierr = sblas_error(sblas_svdv(alpha, Row[i], b, &val));
     if (ierr != sb_OK) return ierr;
     
-    ierr = sblas_error(sblas_svecentry(pc[0], i+1, val));
+    ierr = sblas_error(sblas_svecentry(pc[0], i, val));
     if (ierr != sb_OK) return ierr;
   }
   
@@ -187,8 +187,8 @@ int sblas_smxm(double alpha, sblas_smat *A,
                                     Col[j], &val));
       if (ierr != sb_OK) return ierr;
       
-      ierr = sblas_error(sblas_smatentry(pC[0], i+1, 
-                                         j+1, val));
+      ierr = sblas_error(sblas_smatentry(pC[0], i,
+                                         j, val));
       if (ierr != sb_OK) return ierr;
     }
   }

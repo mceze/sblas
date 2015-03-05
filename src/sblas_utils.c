@@ -131,7 +131,7 @@ int sblas_svec2dvec(sblas_svec *V, double **pdV)
   z = 0;
   for (i = 0; i < V->m; i++){
     if (i+1 == V->index[z]){
-      (*pdV)[V->index[z]-1] = V->val[z];
+      (*pdV)[V->index[z]] = V->val[z];
       z++;
     }
     else
@@ -156,8 +156,8 @@ int sblas_svecentry(sblas_svec *V, int index,
     return sb_OK;
   
   //change size if necessary
-  if (index > V->m)
-    V->m = index;
+  if (index >= V->m)
+    V->m = index+1;
   
   /* adding entry for the first time? */
   if (V->nZ == 0){
@@ -258,14 +258,14 @@ int sblas_smatentry(sblas_smat *M, int row,
     return sblas_error(sb_OUT_OF_BOUNDS);
   
   //store nz before and then add the new nz for the row
-  M->nZ -= M->Row[row-1]->nZ;
+  M->nZ -= M->Row[row]->nZ;
   
-  ierr = sblas_error(sblas_svecentry(M->Row[row-1], col, value));
+  ierr = sblas_error(sblas_svecentry(M->Row[row], col, value));
   if (ierr != sb_OK) return ierr;
   
-  M->nZ += M->Row[row-1]->nZ;
+  M->nZ += M->Row[row]->nZ;
   
-  ierr = sblas_error(sblas_svecentry(M->Col[col-1], row, value));
+  ierr = sblas_error(sblas_svecentry(M->Col[col], row, value));
   if (ierr != sb_OK) return ierr;
   
   return sb_OK;
