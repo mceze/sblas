@@ -159,7 +159,8 @@ int sblas_writesvecascii(char *filename, sblas_svec *V)
 
 /* function: sblas_writesmatascii */
 /* writes out a sparse matrix in ijv format */
-int sblas_writesmatascii(char *filename, sblas_smat *M)
+int sblas_writesmatascii(char *filename, sblas_smat *M,
+                         enum sblas_bool ByRow)
 {
   int ierr, i, j;
   FILE *fid;
@@ -170,13 +171,24 @@ int sblas_writesmatascii(char *filename, sblas_smat *M)
   ierr = fprintf(fid,"%% %d %d\n", M->m, M->n);
   if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
-  for (i = 0; i < M->m; i++)
-    for (j = 0; j < M->Row[i]->nZ; j++){
-      ierr = fprintf(fid,"%d %d %1.15e\n",  
-                     i+1, M->Row[i]->index[j]+1,
-                     M->Row[i]->val[j]);
-      if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
-    }
+  if (ByRow){
+    for (i = 0; i < M->m; i++)
+      for (j = 0; j < M->Row[i]->nZ; j++){
+        ierr = fprintf(fid,"%d %d %1.15e\n",
+                       i+1, M->Row[i]->index[j]+1,
+                       M->Row[i]->val[j]);
+        if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
+      }
+  }
+  else {
+    for (i = 0; i < M->n; i++)
+      for (j = 0; j < M->Col[i]->nZ; j++){
+        ierr = fprintf(fid,"%d %d %1.15e\n",
+                       M->Col[i]->index[j]+1, i+1,
+                       M->Col[i]->val[j]);
+        if (ierr < sb_OK) return sblas_error(sb_READWRITE_ERROR);
+      }
+  }
   ierr = fclose(fid);
   if (ierr != sb_OK) return sblas_error(sb_READWRITE_ERROR);
   
