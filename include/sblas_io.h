@@ -12,6 +12,7 @@
 
 #include "sblas_def.h"
 #include "sblas_struct.h"
+#include "sblas_enum.h"
 
 /* function:  sblas_ER*/
 /* reports the file, line and call  where the error happened*/
@@ -33,6 +34,7 @@ int sblas_writesvecascii(char *filename, sblas_svec *V);
 
 /* function: sblas_writesmatascii */
 /* writes out a sparse matrix in HYPRE format */
-int sblas_writesmatascii(char *filename, sblas_smat *M);
+int sblas_writesmatascii(char *filename, sblas_smat *M,
+                         enum sblas_bool ByRow);
 
 #endif
