@@ -1,13 +1,13 @@
-TOPDIR = $(PWD)
+TOPDIR = /Users/mdebarro/Desktop/sblas
 
 INCDIR = $(TOPDIR)/include
 SRCDIR = $(TOPDIR)/src
 LIBDIR = $(TOPDIR)/lib
-CC = clang
-LD = clang
-CFLAGS = -g -O3 -fPIC
-LDFLAGS = -dynamiclib
-LIBS = -lm
+CC = ~/homebrew/bin/gcc-4.9
+LD = ~/homebrew/bin/gcc-4.9
+CFLAGS = -g -O3 -fPIC -arch i386
+LDFLAGS = -shared -arch i386
+LIBS = -fopenmp
 
 OBJLIST = $(SRCDIR)/sblas_io.o \
           $(SRCDIR)/sblas_linalg.o \
@@ -17,15 +17,15 @@ OBJLIST = $(SRCDIR)/sblas_io.o \
 
 DEPS = $(INCDIR)/%.h
 
-all: sblasobj libsblas.dylib
+all: sblasobj libsblas
 
 sblasobj:
 	@(cd $(SRCDIR); $(CC) -c $(SRCDIR)/*.c $< $(CFLAGS) $(LIBS) -I$(INCDIR))
 
 
-libsblas.dylib: $(OBJLIST)
-	$(LD) $(LDFLAGS) -o $@ $(CFLAGS) $^ $(LIBS)
-	mv $@ $(LIBDIR)/
+libsblas: $(OBJLIST)
+	$(LD) $(LDFLAGS) -o $@.dylib $^ $(LIBS)
+	mv $@.dylib $(LIBDIR)/
 
 .PHONY: clean
 

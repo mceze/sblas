@@ -14,7 +14,9 @@
 #include "sblas_io.h"
 #include "sblas_aux.h"
 #include "sblas_utils.h"
+#include <omp.h>
 
+#define NTHREAD 8
 /* function: sblas_svdv */
 /* sparse dot product between 2 vectors*/
 int sblas_svdv(double alpha, sblas_svec *Va,
@@ -136,6 +138,82 @@ int sblas_smxv(double alpha, sblas_smat *A,
     ierr = sblas_error(sblas_svecentry(pc[0], i, val));
     if (ierr != sb_OK) return ierr;
   }
+  
+  return sb_OK;
+}
+
+/* sparse matrix-vector product: A*b=c
+ if Alloc = True, a new vector c is created */
+int sblas_smxv_omp(double alpha, sblas_smat *A,
+                   enum sblas_bool TrA,sblas_svec *b,
+                   sblas_svec **pc, enum sblas_bool Alloc)
+{
+  int ierr, i, m, n, ntd, tid, mt, st, rm, d;
+  double val;
+  sblas_svec **Row;
+  
+  if (A == NULL || b == NULL)
+    return sb_INPUT_ERROR;
+  
+  if (TrA){
+    m = A->n;
+    n = A->m;
+    Row = A->Col;
+  }
+  else {
+    m = A->m;
+    n = A->n;
+    Row = A->Row;
+  }
+  
+  if (n != b->m)
+    return sblas_error(sb_INCOMPATIBLE);
+  if (Alloc){
+    //create rhs
+    ierr = sblas_error(sblas_createsvec(pc, m));
+    if (ierr != sb_OK) return ierr;
+  }
+  else if (pc[0]->m != b->m)
+    return sblas_error(sb_INCOMPATIBLE);
+  //begining of openmp portion
+  //each thread has a part or the resulting vector and later we stich them together
+  omp_set_num_threads(NTHREAD);
+  sblas_svec *cpart[NTHREAD];
+#pragma omp parallel private(tid, mt, st, i, val)
+  {
+    tid = omp_get_thread_num();
+    ntd = omp_get_num_threads();
+    //setup ranges of operations for each thread
+    rm = m%ntd;
+    d = floor(m/ntd);
+    mt  = d + (tid < rm);
+    st  = tid*(d+(tid < rm)) + (tid >= rm)*rm;
+    sblas_createsvec(&cpart[tid], m);
+    //each thread operates on non-overlaping parts of the vector
+    cpart[tid]->nZprealloc = mt;
+    cpart[tid]->index = malloc(mt*sizeof(int));
+    cpart[tid]->val = malloc(mt*sizeof(double));
+    
+    for (i = st; i < st+mt; i++){
+      //row dotted with vec
+      sblas_error(sblas_svdv(alpha, Row[i], b, &val));
+      //add val to c
+      sblas_error(sblas_svecentry(cpart[tid], i, val));
+    }
+    pc[0]->nZ += cpart[tid]->nZ;
+  }
+  //end of openmp portion
+  pc[0]->nZprealloc = pc[0]->nZ;
+  pc[0]->index = malloc(pc[0]->nZprealloc*sizeof(int));
+  pc[0]->val = malloc(pc[0]->nZprealloc*sizeof(double));
+  st = 0;
+  for (tid = 0; tid < NTHREAD; tid++) {
+    memcpy(pc[0]->index+st,cpart[tid]->index+0,cpart[tid]->nZ*sizeof(int));
+    memcpy(pc[0]->val+st,cpart[tid]->val+0,cpart[tid]->nZ*sizeof(double));
+    st  += cpart[tid]->nZ;
+    sblas_destroysvec(cpart[tid]);
+  }
+  
   
   return sb_OK;
 }

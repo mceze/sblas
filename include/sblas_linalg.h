@@ -26,6 +26,10 @@ int sblas_smxv(double alpha, sblas_smat *A,
                enum sblas_bool TrA,sblas_svec *b,
                sblas_svec **pc, enum sblas_bool Alloc);
 
+int sblas_smxv_omp(double alpha, sblas_smat *A,
+                   enum sblas_bool TrA,sblas_svec *b,
+                   sblas_svec **pc, enum sblas_bool Alloc);
+
 /* function: sblas_smxm */
 /* sparse matrix-matrix product: op(A)xop(B)=C*/
 int sblas_smxm(double alpha, sblas_smat *A, 

@@ -175,7 +175,7 @@ int sblas_svecentry(sblas_svec *V, int index,
     V->val[0] = value;
   }
   else{
-    /* is it a new entry */
+    /* is it a new entry? */
     if ((z = sblas_bsearch(index, V->index, 0, 
                            V->nZ-1, &rank)) == sb_NOT_FOUND){
       /* make sure that there is enough space in the 
