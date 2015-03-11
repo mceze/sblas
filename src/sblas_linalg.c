@@ -51,9 +51,9 @@ int sblas_svdv(double alpha, sblas_svec *Va,
     z = 0;
     i = 0;
     begin = 0;
-    end = Vr->nZ-1;
+    end = max(Vr->nZ-1,0);
     top_i = 0;
-    bot_i = Vl->nZ-1;
+    bot_i = max(Vl->nZ-1,0);
     while (z <= Vl->nZ){
       //check overlap
       if (Vl->index[top_i] > Vr->index[end]||
@@ -87,7 +87,7 @@ int sblas_svdv(double alpha, sblas_svec *Va,
       }
       i++;
       top_i = i;
-      bot_i = Vl->nZ-1-i;
+      bot_i = max(Vl->nZ-1-i,0);
     }
   }
   
