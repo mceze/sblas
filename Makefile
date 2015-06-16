@@ -1,11 +1,12 @@
-TOPDIR = $(PWD)
+#TOPDIR = $(PWD)
+TOPDIR = /Users/mdebarro/Desktop/sblas
 
 INCDIR = $(TOPDIR)/include
 SRCDIR = $(TOPDIR)/src
 LIBDIR = $(TOPDIR)/lib
 CC = clang
 LD = clang
-CFLAGS = -g -O3 -fPIC
+CFLAGS = -g -O2 -fPIC
 LDFLAGS = -dynamiclib
 LIBS = -lm
 

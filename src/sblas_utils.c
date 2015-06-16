@@ -20,9 +20,11 @@ int sblas_initsvec(sblas_svec *V, int m)
   
   V->m = m;
   V->nZ = 0;
-  V->nZprealloc = 0;
-  V->index = NULL;
-  V->val = NULL;
+  V->nZprealloc = 10;
+  V->index = malloc(V->nZprealloc*sizeof(int));
+  memset(V->index, 0, V->nZprealloc*sizeof(int));
+  V->val = malloc(V->nZprealloc*sizeof(double));
+  memset(V->val, 0, V->nZprealloc*sizeof(double));
   
   return sb_OK;
 }
@@ -163,7 +165,7 @@ int sblas_svecentry(sblas_svec *V, int index,
   if (V->nZ == 0){
     V->nZ++;
     if (V->nZ > V->nZprealloc){
-      V->nZprealloc = V->nZ;
+      V->nZprealloc = min(2*(V->nZ+10),V->m);
       if((V->index = realloc(V->index, V->nZprealloc
                              *sizeof(int))) == NULL)
         return sblas_error(sb_MEMORY_ERROR);
