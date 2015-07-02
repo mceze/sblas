@@ -41,6 +41,7 @@
 #define sb_MEMORY_ERROR    -5
 #define sb_NOT_FOUND       -6
 #define sb_OUT_OF_BOUNDS   -7
+#define sb_BREAKDOWN       -8
 
 
 

@@ -25,6 +25,9 @@ int main()
   ierr = sblas_error(sblas_readsvec("cg/b.txt", &B));
   if (ierr != sb_OK) return ierr;
   
+  ierr = sblas_error(sblas_readsvec("cg/x.txt", &x));
+  if (ierr != sb_OK) return ierr;
+  
 //  s = clock();
 //  //Matrix vector product
 //  ierr = sblas_error(sblas_smxv(1.0, A, True, V, &B));
@@ -36,11 +39,11 @@ int main()
 //  ierr = sblas_error(sblas_smxm(1.0, A, True, A, False, &H));
 //  if (ierr != sb_OK) return ierr;
 //  
-  ierr = sblas_error(sblas_cpvec(B, &x));
-  if (ierr != sb_OK) return ierr;
+//  ierr = sblas_error(sblas_cpvec(B, &x));
+//  if (ierr != sb_OK) return ierr;
   
   s = clock();
-  ierr = sblas_error(sblas_conjgrad(H, B, x, 1e-13, 1000));
+  ierr = sblas_error(sblas_qmr(H, B, x, 1e-13, 1000));
   if (ierr != sb_OK) return ierr;
   e = clock();
   printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);

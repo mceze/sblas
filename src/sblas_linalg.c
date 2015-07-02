@@ -388,10 +388,10 @@ int sblas_cpvec(sblas_svec *a, sblas_svec **pb)
   b->nZprealloc = a->nZprealloc;
   
   if ((b->index = malloc(b->nZprealloc*sizeof(int))) == NULL)
-    return sb_OK;
+    return sb_MEMORY_ERROR;
   memcpy(b->index+0, a->index+0, a->nZprealloc*sizeof(int));
   if ((b->val = malloc(b->nZprealloc*sizeof(double))) == NULL)
-    return sb_OK;
+    return sb_MEMORY_ERROR;
   memcpy(b->val+0, a->val+0, a->nZprealloc*sizeof(double));
   
   (*pb) = b;
