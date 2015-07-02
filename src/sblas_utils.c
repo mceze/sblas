@@ -273,3 +273,39 @@ int sblas_smatentry(sblas_smat *M, int row,
   return sb_OK;
 }
 
+/* function: sblas_svec_getentry */
+/* get an entry from vec */
+int sblas_svec_getentry(sblas_svec *V, int k, double *value)
+{
+  int t;
+
+  t = sblas_bsearch(k, V->index, 0, V->nZ-1, NULL);
+  if (t < 0) return sblas_error(sb_NOT_FOUND);
+  
+  (*value) = V->val[t];
+  
+  return sb_OK;
+}
+
+/* function: sblas_smat_getentry */
+/* get an entry from mat */
+int sblas_smat_getentry(sblas_smat *M, int i, int j, double *value)
+{
+  int ierr;
+  
+  if (M->Row != NULL){
+    if (M->Col == NULL)
+      return sblas_error(sb_INPUT_ERROR);
+    ierr = sblas_error(sblas_svec_getentry(M->Row[i], j, value));
+    if (ierr != sb_OK) return ierr;
+  }
+  else if (M->Col != NULL){
+    if (M->Row == NULL)
+      return sblas_error(sb_INPUT_ERROR);
+    ierr = sblas_error(sblas_svec_getentry(M->Col[j], i, value));
+    if (ierr != sb_OK) return ierr;
+  }
+  else return sblas_error(sb_INPUT_ERROR);
+  
+  return sb_OK;
+}

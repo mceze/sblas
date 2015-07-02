@@ -8,17 +8,32 @@
 
 /* Begin PBXBuildFile section */
 		908AE5DA1A96650500E08ECA /* MxV.c in Sources */ = {isa = PBXBuildFile; fileRef = 90B0B4D6197726CE00C499AB /* MxV.c */; };
-		908AE5DC1A96672200E08ECA /* libsblas.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 90B0B4DE19772C1800C499AB /* libsblas.dylib */; };
 		90B0B4D9197726CE00C499AB /* MxV_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 90B0B4D8197726CE00C499AB /* MxV_test.1 */; };
+		EA062B041B4304FE00B23C9C /* sblas_aux.c in Sources */ = {isa = PBXBuildFile; fileRef = 90AC6BC5131CE8B500F96486 /* sblas_aux.c */; };
+		EA062B051B4304FE00B23C9C /* sblas_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 90AC6BC6131CE8B600F96486 /* sblas_io.c */; };
+		EA062B061B4304FE00B23C9C /* sblas_linalg.c in Sources */ = {isa = PBXBuildFile; fileRef = 90AC6BC7131CE8B600F96486 /* sblas_linalg.c */; };
+		EA062B071B4304FE00B23C9C /* sblas_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 90AC6BC8131CE8B600F96486 /* sblas_utils.c */; };
+		EA062B081B43050A00B23C9C /* sblas.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BBB131CE8B500F96486 /* sblas.h */; };
+		EA062B091B43050A00B23C9C /* sblas_aux.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BBC131CE8B500F96486 /* sblas_aux.h */; };
+		EA062B0A1B43050A00B23C9C /* sblas_def.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BBD131CE8B500F96486 /* sblas_def.h */; };
+		EA062B0B1B43050A00B23C9C /* sblas_enum.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BBE131CE8B500F96486 /* sblas_enum.h */; };
+		EA062B0C1B43050A00B23C9C /* sblas_io.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BBF131CE8B500F96486 /* sblas_io.h */; };
+		EA062B0D1B43050A00B23C9C /* sblas_linalg.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BC0131CE8B500F96486 /* sblas_linalg.h */; };
+		EA062B0E1B43050A00B23C9C /* sblas_struct.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BC1131CE8B500F96486 /* sblas_struct.h */; };
+		EA062B0F1B43050A00B23C9C /* sblas_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 90AC6BC2131CE8B500F96486 /* sblas_utils.h */; };
+		EA062B121B43054700B23C9C /* libsblas.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EA062B001B4304E200B23C9C /* libsblas.dylib */; };
+		EA062B1A1B4305DA00B23C9C /* sblas_linsolv.c in Sources */ = {isa = PBXBuildFile; fileRef = EA062B191B4305DA00B23C9C /* sblas_linsolv.c */; };
+		EA062B1B1B4305DA00B23C9C /* sblas_linsolv.c in Sources */ = {isa = PBXBuildFile; fileRef = EA062B191B4305DA00B23C9C /* sblas_linsolv.c */; };
+		EA062B1D1B4305E200B23C9C /* sblas_linsolv.h in Headers */ = {isa = PBXBuildFile; fileRef = EA062B1C1B4305E200B23C9C /* sblas_linsolv.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		90B0B4FB19780E0200C499AB /* PBXContainerItemProxy */ = {
+		EA062B101B43052900B23C9C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 90B0B4C7197722E300C499AB;
-			remoteInfo = sblas_make;
+			remoteGlobalIDString = EA062AFF1B4304E200B23C9C;
+			remoteInfo = sblas;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -58,6 +73,9 @@
 		90B0B4D8197726CE00C499AB /* MxV_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = MxV_test.1; sourceTree = "<group>"; };
 		90B0B4DD197726FD00C499AB /* test */ = {isa = PBXFileReference; lastKnownFileType = folder; path = test; sourceTree = "<group>"; };
 		90B0B4DE19772C1800C499AB /* libsblas.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsblas.dylib; path = lib/libsblas.dylib; sourceTree = "<group>"; };
+		EA062B001B4304E200B23C9C /* libsblas.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libsblas.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA062B191B4305DA00B23C9C /* sblas_linsolv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sblas_linsolv.c; sourceTree = "<group>"; };
+		EA062B1C1B4305E200B23C9C /* sblas_linsolv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sblas_linsolv.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +83,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				908AE5DC1A96672200E08ECA /* libsblas.dylib in Frameworks */,
+				EA062B121B43054700B23C9C /* libsblas.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA062AFD1B4304E200B23C9C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				90B0B4D4197726CE00C499AB /* MxV_test */,
+				EA062B001B4304E200B23C9C /* libsblas.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -111,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				90AC6BBB131CE8B500F96486 /* sblas.h */,
+				EA062B1C1B4305E200B23C9C /* sblas_linsolv.h */,
 				90AC6BBC131CE8B500F96486 /* sblas_aux.h */,
 				90AC6BBD131CE8B500F96486 /* sblas_def.h */,
 				90AC6BBE131CE8B500F96486 /* sblas_enum.h */,
@@ -132,6 +159,7 @@
 		90AC6BC4131CE8B500F96486 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EA062B191B4305DA00B23C9C /* sblas_linsolv.c */,
 				90AC6BC5131CE8B500F96486 /* sblas_aux.c */,
 				90AC6BC6131CE8B600F96486 /* sblas_io.c */,
 				90AC6BC7131CE8B600F96486 /* sblas_linalg.c */,
@@ -150,6 +178,25 @@
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		EA062AFE1B4304E200B23C9C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA062B081B43050A00B23C9C /* sblas.h in Headers */,
+				EA062B091B43050A00B23C9C /* sblas_aux.h in Headers */,
+				EA062B0A1B43050A00B23C9C /* sblas_def.h in Headers */,
+				EA062B0B1B43050A00B23C9C /* sblas_enum.h in Headers */,
+				EA062B0C1B43050A00B23C9C /* sblas_io.h in Headers */,
+				EA062B1D1B4305E200B23C9C /* sblas_linsolv.h in Headers */,
+				EA062B0D1B43050A00B23C9C /* sblas_linalg.h in Headers */,
+				EA062B0E1B43050A00B23C9C /* sblas_struct.h in Headers */,
+				EA062B0F1B43050A00B23C9C /* sblas_utils.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
 		90B0B4C7197722E300C499AB /* sblas_make */ = {
@@ -180,12 +227,29 @@
 			buildRules = (
 			);
 			dependencies = (
-				90B0B4FC19780E0200C499AB /* PBXTargetDependency */,
+				EA062B111B43052900B23C9C /* PBXTargetDependency */,
 			);
 			name = MxV_test;
 			productName = MxV_test;
 			productReference = 90B0B4D4197726CE00C499AB /* MxV_test */;
 			productType = "com.apple.product-type.tool";
+		};
+		EA062AFF1B4304E200B23C9C /* sblas */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA062B031B4304E200B23C9C /* Build configuration list for PBXNativeTarget "sblas" */;
+			buildPhases = (
+				EA062AFC1B4304E200B23C9C /* Sources */,
+				EA062AFD1B4304E200B23C9C /* Frameworks */,
+				EA062AFE1B4304E200B23C9C /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sblas;
+			productName = sblas;
+			productReference = EA062B001B4304E200B23C9C /* libsblas.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -194,6 +258,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0610;
+				TargetAttributes = {
+					EA062AFF1B4304E200B23C9C = {
+						CreatedOnToolsVersion = 6.3.2;
+					};
+				};
 			};
 			buildConfigurationList = 1DEB914E08733D8E0010E9CD /* Build configuration list for PBXProject "sblas" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -211,6 +280,7 @@
 			targets = (
 				90B0B4C7197722E300C499AB /* sblas_make */,
 				90B0B4D3197726CE00C499AB /* MxV_test */,
+				EA062AFF1B4304E200B23C9C /* sblas */,
 			);
 		};
 /* End PBXProject section */
@@ -221,16 +291,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				908AE5DA1A96650500E08ECA /* MxV.c in Sources */,
+				EA062B1A1B4305DA00B23C9C /* sblas_linsolv.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA062AFC1B4304E200B23C9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA062B071B4304FE00B23C9C /* sblas_utils.c in Sources */,
+				EA062B1B1B4305DA00B23C9C /* sblas_linsolv.c in Sources */,
+				EA062B061B4304FE00B23C9C /* sblas_linalg.c in Sources */,
+				EA062B051B4304FE00B23C9C /* sblas_io.c in Sources */,
+				EA062B041B4304FE00B23C9C /* sblas_aux.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		90B0B4FC19780E0200C499AB /* PBXTargetDependency */ = {
+		EA062B111B43052900B23C9C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 90B0B4C7197722E300C499AB /* sblas_make */;
-			targetProxy = 90B0B4FB19780E0200C499AB /* PBXContainerItemProxy */;
+			target = EA062AFF1B4304E200B23C9C /* sblas */;
+			targetProxy = EA062B101B43052900B23C9C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -351,7 +434,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -418,6 +501,88 @@
 			};
 			name = Release;
 		};
+		EA062B011B4304E200B23C9C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		EA062B021B4304E200B23C9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -447,6 +612,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		EA062B031B4304E200B23C9C /* Build configuration list for PBXNativeTarget "sblas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA062B011B4304E200B23C9C /* Debug */,
+				EA062B021B4304E200B23C9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

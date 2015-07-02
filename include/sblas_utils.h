@@ -52,4 +52,12 @@ int sblas_svecentry(sblas_svec *V, int index,
 int sblas_smatentry(sblas_smat *M, int row,  
                     int col, double value);
 
+/* function: sblas_svec_getentry */
+/* get an entry from vec */
+int sblas_svec_getentry(sblas_svec *V, int k, double *value);
+
+/* function: sblas_smat_getentry */
+/* get an entry from mat */
+int sblas_smat_getentry(sblas_smat *M, int i, int j, double *value);
+
 #endif

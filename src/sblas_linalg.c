@@ -203,6 +203,7 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
 {
   int ierr, z;
   double al, ar;
+  int inplace = 0;
   sblas_svec *Vl, *Vr;
   
   if (Va == NULL || Vb == NULL)
@@ -224,26 +225,60 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
     ar = a;
   }
   
-  ierr = sblas_error(sblas_createsvec(pVc, Va->m));
-  if (ierr != sb_OK) return ierr;
+  //check if we are operating in place
+  if (pVc[0] == Vl)
+    inplace = -1;
+  if (pVc[0] == Vr)
+    inplace = 1;
   
-  for (z = 0; z < Vl->nZ; z++){
-    ierr = sblas_error(sblas_svecentry(pVc[0], 
-                                       Vl->index[z], 
-                                       al*Vl->val[z]));
+  if (inplace == 0){
+    ierr = sblas_error(sblas_createsvec(pVc, Va->m));
     if (ierr != sb_OK) return ierr;
-    
-    ierr = sblas_error(sblas_svecentry(pVc[0], 
-                                       Vr->index[z], 
-                                       ar*Vr->val[z]));
-    if (ierr != sb_OK) return ierr;
+    //sum small array region
+    for (z = 0; z < Vl->nZ; z++){
+      ierr = sblas_error(sblas_svecentry(pVc[0],
+                                         Vl->index[z],
+                                         al*Vl->val[z]));
+      if (ierr != sb_OK) return ierr;
+      
+      ierr = sblas_error(sblas_svecentry(pVc[0],
+                                         Vr->index[z],
+                                         ar*Vr->val[z]));
+      if (ierr != sb_OK) return ierr;
+    }
+    //sum remainder part
+    for (z = Vl->nZ; z < Vr->nZ; z++){
+      ierr = sblas_error(sblas_svecentry(pVc[0],
+                                         Vr->index[z],
+                                         ar*Vr->val[z]));
+      if (ierr != sb_OK) return ierr;
+    }
   }
-  
-  for (z = Vl->nZ; z < Vr->nZ; z++){
-    ierr = sblas_error(sblas_svecentry(pVc[0], 
-                                       Vr->index[z], 
-                                       ar*Vr->val[z]));
-    if (ierr != sb_OK) return ierr;
+  else if (inplace == -1){//left vector is updated
+    //multiply first
+    for (z = 0; z < Vl->nZ; z++){
+      Vl->val[z] *= al;
+    }
+    //add second vector
+    for (z = 0; z < Vr->nZ; z++){
+      ierr = sblas_error(sblas_svecentry(pVc[0],
+                                         Vr->index[z],
+                                         ar*Vr->val[z]));
+      if (ierr != sb_OK) return ierr;
+    }
+  }
+  else if (inplace == 1){
+    //multiply first
+    for (z = 0; z < Vr->nZ; z++){
+      Vr->val[z] *= ar;
+    }
+    //add second vector
+    for (z = 0; z < Vl->nZ; z++){
+      ierr = sblas_error(sblas_svecentry(pVc[0],
+                                         Vl->index[z],
+                                         al*Vl->val[z]));
+      if (ierr != sb_OK) return ierr;
+    }
   }
   
   return sb_OK;
