@@ -49,10 +49,22 @@ int main()
   ierr = sblas_error(sblas_writesvecascii("x.txt", x));
   if (ierr != sb_OK) return ierr;
   
+  //test in-place vector increment
+  ierr = sblas_error(sblas_svpv(2.3, B, 1.3, x, &V));
+  if (ierr != sb_OK) return ierr;
+  
+  //test in-place vector increment
+  ierr = sblas_error(sblas_svpv(2.3, B, 1.3, x, &B));
+  if (ierr != sb_OK) return ierr;
+  
+  sblas_svec *test;
+  ierr = sblas_error(sblas_svpv(1.0, B, -1.0, V, &test));
+  if (ierr != sb_OK) return ierr;
   
   //sblas_destroysmat(A);
   sblas_destroysmat(H);
-  //sblas_destroysvec(V);
+  sblas_destroysvec(V);
+  sblas_destroysvec(test);
   sblas_destroysvec(B);
   sblas_destroysvec(x);
   
