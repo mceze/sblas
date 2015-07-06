@@ -443,3 +443,17 @@ int sblas_svadd(double a, sblas_svec *Va, double b, sblas_svec *Vb)
   return sb_OK;
 }
 
+/* function: sblas_sv2norm */
+/* vector 2-norm */
+double sblas_sv2norm(sblas_svec *Va)
+{
+  double norm = 0.0;
+  int i;
+  
+  for (i = 0; i < Va->nZ; i++)
+    norm += Va->val[i]*Va->val[i];
+  norm = sqrt(norm);
+  
+  return norm;
+}
+

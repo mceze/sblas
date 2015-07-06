@@ -61,6 +61,10 @@ int sblas_scalevec(sblas_svec *Va, double a);
 int sblas_svadd(double a, sblas_svec *Va, double b,
                 sblas_svec *Vb);
 
+/* function: sblas_sv2norm */
+/* vector 2-norm */
+double sblas_sv2norm(sblas_svec *Va);
+
 #endif
 
 

@@ -18,7 +18,7 @@
 #include <math.h>
 
 /* definitions */
-#define MEPS 1e-15 // machine precision
+#define MEPS 1e-16 // machine precision
 #define MAX_LINE_LENGTH 400 //maximum line length
 #define MAX_STR_LENGTH 100 //maximum string length
 
@@ -31,6 +31,7 @@
 
 /* Error Macro: used to report error occurrences */
 #define sblas_error(X) (sblas_er( __FILE__, __LINE__, #X, (X)))
+#define call(X) do{ierr = sblas_error(X); if(ierr != sb_OK) return ierr;} while(0)
 
 /* Error codes */
 #define sb_OK               0

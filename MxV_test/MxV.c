@@ -25,8 +25,8 @@ int main()
   ierr = sblas_error(sblas_readsvec("cg/b.txt", &B));
   if (ierr != sb_OK) return ierr;
   
-  ierr = sblas_error(sblas_readsvec("cg/x.txt", &x));
-  if (ierr != sb_OK) return ierr;
+//  ierr = sblas_error(sblas_readsvec("cg/x.txt", &x));
+//  if (ierr != sb_OK) return ierr;
   
 //  s = clock();
 //  //Matrix vector product
@@ -39,8 +39,11 @@ int main()
 //  ierr = sblas_error(sblas_smxm(1.0, A, True, A, False, &H));
 //  if (ierr != sb_OK) return ierr;
 //  
-//  ierr = sblas_error(sblas_cpvec(B, &x));
-//  if (ierr != sb_OK) return ierr;
+  ierr = sblas_error(sblas_cpvec(B, &x));
+  if (ierr != sb_OK) return ierr;
+  
+  ierr = sblas_error(sblas_zerovec(x));
+  if (ierr != sb_OK) return ierr;
   
   s = clock();
   ierr = sblas_error(sblas_qmr(H, B, x, 1e-13, 1000));

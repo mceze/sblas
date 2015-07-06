@@ -8,10 +8,10 @@
 
 #include "sblas.h"
 
-/* function: sblas_conjgrad */
+/* function: sblas_cg */
 /* Solves A*x = b, with A symmetric, positive definite, 
  using the conjugate gradient method*/
-int sblas_conjgrad(sblas_smat *A, sblas_svec *b,
+int sblas_cg(sblas_smat *A, sblas_svec *b,
                    sblas_svec *x, float const tol,
                    int const niter)
 {
@@ -26,7 +26,7 @@ int sblas_conjgrad(sblas_smat *A, sblas_svec *b,
   for (i = 0; i < A->m; i++) {
     ierr = sblas_error(sblas_smat_getentry(A, i, i, &val));
     if (ierr != sb_OK) return ierr;
-    ierr = sblas_error(sblas_smatentry(M, i, i, 1.0/val));
+    ierr = sblas_error(sblas_smatentry(M, i, i, 1.0));
     if (ierr != sb_OK) return ierr;
   }
   
@@ -124,147 +124,142 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
 {
   int ierr, it;
   double rho, qsi, gamma, eta, delta, eps, beta, theta;
-  double temp, rnorm0,rnorm;
+  double theta_prev, gamma_prev, eta_prev, rho_next, qsi_next;
+  double rnorm0,rnorm;
   sblas_svec *r, *v, *w, *p=NULL, *q=NULL, *ptil, *s, *d;
   
+  /********************/
+  // r = b - A*x
+  /********************/
   //allocate residual and compute its initial value
-  ierr = sblas_error(sblas_smxv(-1.0, A, False, x, &r, True));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_smxv(-1.0, A, False, x, &r, True));
   //add "b" in place
-  ierr = sblas_error(sblas_svpv(1.0, r, 1.0, b, &r));
-  if (ierr != sb_OK) return ierr;
-  
-  ierr = sblas_error(sblas_svdv(1.0, r, r, &rnorm0));
-  if (ierr != sb_OK) return ierr;
-  rnorm0 = sqrt(rnorm0);
+  call(sblas_svpv(1.0, r, 1.0, b, &r));
+  rnorm0 = sblas_sv2norm(r);
   printf("|R0| = %1.5e\n",rnorm0);
+  
+  /********************/
   //vtil = r
-  ierr = sblas_error(sblas_cpvec(r, &v));
-  if (ierr != sb_OK) return ierr;
-  //rho = |v|
-  ierr = sblas_error(sblas_svdv(1.0, v, v, &rho));
-  if (ierr != sb_OK) return ierr;
-  rho = sqrt(rho);
+  /********************/
+  call(sblas_cpvec(r, &v));
+  rho = sblas_sv2norm(v);
   
+  /********************/
   //wtil = r
-  ierr = sblas_error(sblas_cpvec(r, &w));
-  if (ierr != sb_OK) return ierr;
-  //psi = |w|
-  ierr = sblas_error(sblas_svdv(1.0, w, w, &qsi));
-  if (ierr != sb_OK) return ierr;
-  qsi = sqrt(qsi);
-
-  ierr = sblas_error(sblas_cpvec(v, &ptil));
-  if (ierr != sb_OK) return ierr;
+  /********************/
+  call(sblas_cpvec(r, &w));
+  qsi = sblas_sv2norm(w);
   
-  gamma = 1.0; eta = -1.0;
+  gamma_prev = 1.0; eta_prev = -1.0;
   
   for (it = 0; it < niter; it++) {
     //check for breakdown on Lanczos
     if (rho < MEPS || qsi < MEPS)//(uncurable breakdown)
       return sblas_error(sb_BREAKDOWN);
+    /********************/
     //v = v/|v|
-    ierr = sblas_error(sblas_scalevec(v, 1.0/rho));
-    if (ierr != sb_OK) return ierr;
+    /********************/
+    call(sblas_scalevec(v, 1.0/rho));
+    
+    /********************/
     //w = w/|w|
-    ierr = sblas_error(sblas_scalevec(w, 1.0/qsi));
-    if (ierr != sb_OK) return ierr;
+    /********************/
+    call(sblas_scalevec(w, 1.0/qsi));
+
+    /********************/
     //delta = w^t*v
-    ierr = sblas_error(sblas_svdv(1.0, w, v, &delta));
-    if (ierr != sb_OK) return ierr;
+    /********************/
+    call(sblas_svdv(1.0, w, v, &delta));
+    
     //check for breakdown on Lanczos
-    if (delta < MEPS)//curable
+    if (fabs(delta) < MEPS)//curable
       return sblas_error(sb_BREAKDOWN);
     //compute p and q
     if (it == 0) {
-      ierr = sblas_error(sblas_cpvec(v, &p));
-      if (ierr != sb_OK) return ierr;
-      ierr = sblas_error(sblas_cpvec(w, &q));
-      if (ierr != sb_OK) return ierr;
+      //this creates both p and q
+      call(sblas_cpvec(v, &p));
+      call(sblas_cpvec(w, &q));
     }
     else {
       //p = v-((qsi*delta)/eps)*p
-      ierr = sblas_error(sblas_svpv(-(qsi*delta)/eps,p, 1.0, v, &p));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_svpv(-(qsi*delta)/eps,p, 1.0, v, &p));
+      
       //q = w-((rho*delta)/eps)*q
-      ierr = sblas_error(sblas_svpv(-(rho*delta)/eps,q, 1.0, w, &q));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_svpv(-(rho*delta)/eps,q, 1.0, w, &q));
+      
+      call(sblas_zerovec(ptil));
     }
     //ptil = A*p
-    ierr = sblas_error(sblas_zerovec(ptil));
-    if (ierr != sb_OK) return ierr;
-    ierr = sblas_error(sblas_smxv(1.0, A, False, p, &ptil, False));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_smxv(1.0, A, False, p, &ptil, (it==0)?True:False));
     //eps = q^T*ptil
-    ierr = sblas_error(sblas_svdv(1.0, q, ptil, &eps));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svdv(1.0, q, ptil, &eps));
     //check for breakdown
-    if (eps < MEPS)
+    if (fabs(eps) < MEPS)
       return sblas_error(sb_BREAKDOWN);
     beta = eps/delta;
     //check for breakdown
-    if (beta < MEPS)
+    if (fabs(beta) < MEPS)
       return sblas_error(sb_BREAKDOWN);
     //v = ptil-beta*v
-    ierr = sblas_error(sblas_svpv(-beta,v, 1.0, ptil, &v));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svpv(-beta,v, 1.0, ptil, &v));
+    
     //rho = |vtil|
-    ierr = sblas_error(sblas_svdv(1.0, v, v, &rho));
-    if (ierr != sb_OK) return ierr;
-    rho = sqrt(rho);
+    rho_next = sblas_sv2norm(v);
+
     //w = A^T*q-beta*w
-    ierr = sblas_error(sblas_scalevec(w, -beta));
-    if (ierr != sb_OK) return ierr;
-    ierr = sblas_error(sblas_smxv(1.0, A, True, q, &w, False));
-    if (ierr != sb_OK) return ierr;
-    //psi = |w|
-    ierr = sblas_error(sblas_svdv(1.0, w, w, &qsi));
-    if (ierr != sb_OK) return ierr;
-    qsi = sqrt(qsi);
+    call(sblas_scalevec(w, -beta));
+    call(sblas_smxv(1.0, A, True, q, &w, False));
+    //qsi = |w|
+    qsi_next = sblas_sv2norm(w);
+
     //theta = rho/(gamma*|beta|)
-    theta = rho/(gamma*fabs(beta));
+    theta = rho_next/(gamma_prev*fabs(beta));
     //gamma = 1/sqrt(1+theta^2)
-    temp = gamma;
     gamma = 1.0/sqrt(1.0+theta*theta);
-    if (isnan(gamma))
+    if (fabs(gamma) < MEPS)
       return sblas_error(sb_BREAKDOWN);
     //eta = -eta*rho*gamma^2/(beta*gamma^2)
-    eta = -eta*rho*gamma*gamma/(beta*temp*temp);
+    eta = -eta_prev*rho*gamma*gamma/(beta*gamma_prev*gamma_prev);
+    
     if (it == 0){
       //d = eta*p
-      ierr = sblas_error(sblas_cpvec(p, &d));
-      if (ierr != sb_OK) return ierr;
-      ierr = sblas_error(sblas_scalevec(d, eta));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_cpvec(p, &d));
+      call(sblas_scalevec(d, eta));
+      
       //s = eta*ptil
-      ierr = sblas_error(sblas_cpvec(ptil, &s));
-      if (ierr != sb_OK) return ierr;
-      ierr = sblas_error(sblas_scalevec(s, eta));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_cpvec(ptil, &s));
+      call(sblas_scalevec(s, eta));
     }
     else {
       //d = eta*p + (theta*gamma)^2*d
-      ierr = sblas_error(sblas_svpv((theta*gamma)*(theta*gamma),d, eta, p,&d));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_svpv((theta_prev*gamma)*(theta_prev*gamma),d, eta, p,&d));
       //s = eta*ptil + (theta*gamma)^2*s
-      ierr = sblas_error(sblas_svpv((theta*gamma)*(theta*gamma),s, eta, ptil,&s));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_svpv((theta_prev*gamma)*(theta_prev*gamma),s, eta, ptil,&s));
     }
     //x = x+d
-    ierr = sblas_error(sblas_svpv(1.0,x, 1.0, d,&x));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svpv(1.0,x, 1.0, d,&x));
     //r = r-s
-    ierr = sblas_error(sblas_svpv(1.0,r, -1.0, s,&r));
-    if (ierr != sb_OK) return ierr;
-    ierr = sblas_error(sblas_svdv(1.0, r, r, &rnorm));
-    if (ierr != sb_OK) return ierr;
-    rnorm0 = sqrt(rnorm);
+    call(sblas_svpv(1.0,r, -1.0, s,&r));
+    
+    theta_prev = theta;
+    gamma_prev  = gamma;
+    eta_prev  = eta;
+    rho       = rho_next;
+    qsi       = qsi_next;
+    
+    rnorm = sblas_sv2norm(r);
     printf("Iteration %d |R|/|R0| = %1.5e\n",it, rnorm/rnorm0);
+    if (rnorm < tol) break;
   }
   
-  
-  
-  
+  sblas_destroysvec(r);
+  sblas_destroysvec(v);
+  sblas_destroysvec(w);
+  sblas_destroysvec(p);
+  sblas_destroysvec(q);
+  sblas_destroysvec(ptil);
+  sblas_destroysvec(s);
+  sblas_destroysvec(d);
   
   return sb_OK;
 }

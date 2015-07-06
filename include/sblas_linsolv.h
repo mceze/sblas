@@ -11,9 +11,9 @@
 
 #include "sblas.h"
 
-/* function: sblas_conjgrad */
+/* function: sblas_cg */
 /* sparse matrix-vector product: Axb=c*/
-int sblas_conjgrad(sblas_smat *A, sblas_svec *b,
+int sblas_cg(sblas_smat *A, sblas_svec *b,
                    sblas_svec *x, float const tol, int const niter);
 
 /* function: sblas_qmr_la */
