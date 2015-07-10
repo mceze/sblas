@@ -24,7 +24,7 @@ int sblas_initsvec(sblas_svec *V, int m)
   V->index = malloc(V->nZprealloc*sizeof(int));
   memset(V->index, 0, V->nZprealloc*sizeof(int));
   V->val = malloc(V->nZprealloc*sizeof(double));
-  memset(V->val, 0, V->nZprealloc*sizeof(double));
+  memset(V->val, 0.0, V->nZprealloc*sizeof(double));
   
   return sb_OK;
 }

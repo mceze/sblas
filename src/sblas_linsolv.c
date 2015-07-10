@@ -177,13 +177,11 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
       return sblas_error(sb_BREAKDOWN);
 
     //v = vtil/rho
-    call(sblas_zerovec(v));
     call(sblas_svadd(1.0/rho, vtil, 0.0, v));
     //y = y/rho
     call(sblas_scalevec(y, 1.0/rho));
     
     //w = wtil/qsi
-    call(sblas_zerovec(w));
     call(sblas_svadd(1.0/qsi, wtil, 0.0, w));
     //z = z/qsi
     call(sblas_scalevec(z, 1.0/qsi));

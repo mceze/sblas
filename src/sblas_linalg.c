@@ -403,8 +403,7 @@ int sblas_cpvec(sblas_svec *a, sblas_svec **pb)
 /* set Va(i) = 0.0*/
 int sblas_zerovec(sblas_svec *Va)
 {
-  int i;
-  for (i = 0;i < Va->nZprealloc;i++)Va->val[i] = 0.0;
+  memset(Va->val, 0.0, Va->nZprealloc*sizeof(double));
   Va->nZ = 0;
   
   return sb_OK;
@@ -415,7 +414,7 @@ int sblas_zerovec(sblas_svec *Va)
 int sblas_scalevec(sblas_svec *Va, double a)
 {
   int i;
-  if (a <= MEPS) return sblas_error(sblas_zerovec(Va));
+  if (fabs(a) <= MEPS) return sblas_error(sblas_zerovec(Va));
   for (i = 0;i < Va->nZ;i++)Va->val[i] *= a;
   
   return sb_OK;
