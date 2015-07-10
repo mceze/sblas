@@ -430,15 +430,19 @@ int sblas_svadd(double a, sblas_svec *Va, double b, sblas_svec *Vb)
   
   if (Va->m != Vb->m) return sblas_error(sb_INCOMPATIBLE);
   
-  ierr = sblas_error(sblas_scalevec(Vb, b));
-  if (ierr != sb_OK) return ierr;
-  
-  for (i = 0; i < Va->nZ; i++) {
-    idx = Va->index[i];
-    val = a*Va->val[i];
-    ierr = sblas_error(sblas_svecentry(Vb, idx, val));
-    if (ierr != sb_OK) return ierr;
+  if (b == 0.0){
+    call(sblas_zerovec(Vb));
   }
+  else{
+    call(sblas_scalevec(Vb, b));
+  }
+  if (a != 0.0)
+    for (i = 0; i < Va->nZ; i++) {
+      idx = Va->index[i];
+      val = a*Va->val[i];
+      ierr = sblas_error(sblas_svecentry(Vb, idx, val));
+      if (ierr != sb_OK) return ierr;
+    }
   
   return sb_OK;
 }
