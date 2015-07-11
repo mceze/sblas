@@ -39,8 +39,8 @@ int sblas_createsvec(sblas_svec **pV, int m)
   if (((*pV) = malloc(sizeof(sblas_svec))) == NULL)
     return sb_MEMORY_ERROR;
   
-  ierr = sblas_error(sblas_initsvec((*pV), m));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_initsvec((*pV), m));
+  
   
   return sb_OK;
 }
@@ -59,14 +59,14 @@ int sblas_initsmat(sblas_smat *M, int m, int n)
   if ((M->Row = malloc(M->m*sizeof(sblas_svec))) == NULL)
     return sb_MEMORY_ERROR;
   for (i = 0; i < M->m; i++) {
-    ierr = sblas_error(sblas_createsvec(&(M->Row[i]), n));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_createsvec(&(M->Row[i]), n));
+    
   }
   if ((M->Col = malloc(M->n*sizeof(sblas_svec))) == NULL)
     return sb_MEMORY_ERROR;
   for (i = 0; i < M->n; i++) {
-    ierr = sblas_error(sblas_createsvec(&(M->Col[i]), m));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_createsvec(&(M->Col[i]), m));
+    
   }
   
   return sb_OK;
@@ -82,8 +82,8 @@ int sblas_createsmat(sblas_smat **pM, int m, int n)
   if (((*pM) = malloc(sizeof(sblas_smat))) == NULL)
     return sb_MEMORY_ERROR;
   
-  ierr = sblas_error(sblas_initsmat((*pM), m, n));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_initsmat((*pM), m, n));
+  
   
   return sb_OK;
 }
@@ -262,13 +262,13 @@ int sblas_smatentry(sblas_smat *M, int row,
   //store nz before and then add the new nz for the row
   M->nZ -= M->Row[row]->nZ;
   
-  ierr = sblas_error(sblas_svecentry(M->Row[row], col, value));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_svecentry(M->Row[row], col, value));
+  
   
   M->nZ += M->Row[row]->nZ;
   
-  ierr = sblas_error(sblas_svecentry(M->Col[col], row, value));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_svecentry(M->Col[col], row, value));
+  
   
   return sb_OK;
 }
@@ -279,10 +279,11 @@ int sblas_svec_getentry(sblas_svec *V, int k, double *value)
 {
   int t;
 
-  t = sblas_bsearch(k, V->index, 0, V->nZ-1, NULL);
-  if (t < 0) return sblas_error(sb_NOT_FOUND);
+  if (k < 0 || k > V->m) return sblas_error(sb_OUT_OF_BOUNDS);
   
-  (*value) = V->val[t];
+  t = sblas_bsearch(k, V->index, 0, V->nZ-1, NULL);
+  if (t < 0) (*value) = 0.0;
+  else (*value) = V->val[t];
   
   return sb_OK;
 }
@@ -296,14 +297,14 @@ int sblas_smat_getentry(sblas_smat *M, int i, int j, double *value)
   if (M->Row != NULL){
     if (M->Col == NULL)
       return sblas_error(sb_INPUT_ERROR);
-    ierr = sblas_error(sblas_svec_getentry(M->Row[i], j, value));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svec_getentry(M->Row[i], j, value));
+    
   }
   else if (M->Col != NULL){
     if (M->Row == NULL)
       return sblas_error(sb_INPUT_ERROR);
-    ierr = sblas_error(sblas_svec_getentry(M->Col[j], i, value));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svec_getentry(M->Col[j], i, value));
+    
   }
   else return sblas_error(sb_INPUT_ERROR);
   

@@ -123,18 +123,18 @@ int sblas_smxv(double alpha, sblas_smat *A,
     return sblas_error(sb_INCOMPATIBLE);
   if (Alloc){
     //create rhs
-    ierr = sblas_error(sblas_createsvec(pc, m));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_createsvec(pc, m));
+    
   }
   else if (pc[0]->m != b->m)
     return sblas_error(sb_INCOMPATIBLE);
   
   for (i = 0; i < m; i++){
-    ierr = sblas_error(sblas_svdv(alpha, Row[i], b, &val));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svdv(alpha, Row[i], b, &val));
     
-    ierr = sblas_error(sblas_svecentry(pc[0], i, val));
-    if (ierr != sb_OK) return ierr;
+    
+    call(sblas_svecentry(pc[0], i, val));
+    
   }
   
   return sb_OK;
@@ -178,18 +178,18 @@ int sblas_smxm(double alpha, sblas_smat *A,
   if (nA != mB)
     return sb_INCOMPATIBLE;
   
-  ierr = sblas_error(sblas_createsmat(pC, mA, nB));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_createsmat(pC, mA, nB));
+  
   
   for (i = 0; i < mA; i++){
     for (j = 0; j < nB; j++){
-      ierr = sblas_error(sblas_svdv(alpha, Row[i], 
+      call(sblas_svdv(alpha, Row[i], 
                                     Col[j], &val));
-      if (ierr != sb_OK) return ierr;
       
-      ierr = sblas_error(sblas_smatentry(pC[0], i,
+      
+      call(sblas_smatentry(pC[0], i,
                                          j, val));
-      if (ierr != sb_OK) return ierr;
+      
     }
   }
   
@@ -232,26 +232,26 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
     inplace = 1;
   
   if (inplace == 0){
-    ierr = sblas_error(sblas_createsvec(pVc, Va->m));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_createsvec(pVc, Va->m));
+    
     //sum small array region
     for (z = 0; z < Vl->nZ; z++){
-      ierr = sblas_error(sblas_svecentry(pVc[0],
+      call(sblas_svecentry(pVc[0],
                                          Vl->index[z],
                                          al*Vl->val[z]));
-      if (ierr != sb_OK) return ierr;
       
-      ierr = sblas_error(sblas_svecentry(pVc[0],
+      
+      call(sblas_svecentry(pVc[0],
                                          Vr->index[z],
                                          ar*Vr->val[z]));
-      if (ierr != sb_OK) return ierr;
+      
     }
     //sum remainder part
     for (z = Vl->nZ; z < Vr->nZ; z++){
-      ierr = sblas_error(sblas_svecentry(pVc[0],
+      call(sblas_svecentry(pVc[0],
                                          Vr->index[z],
                                          ar*Vr->val[z]));
-      if (ierr != sb_OK) return ierr;
+      
     }
   }
   else if (inplace == -1){//left vector is updated
@@ -261,10 +261,10 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
     }
     //add second vector
     for (z = 0; z < Vr->nZ; z++){
-      ierr = sblas_error(sblas_svecentry(pVc[0],
+      call(sblas_svecentry(pVc[0],
                                          Vr->index[z],
                                          ar*Vr->val[z]));
-      if (ierr != sb_OK) return ierr;
+      
     }
   }
   else if (inplace == 1){
@@ -274,10 +274,10 @@ int sblas_svpv(double a, sblas_svec *Va, double b,
     }
     //add second vector
     for (z = 0; z < Vl->nZ; z++){
-      ierr = sblas_error(sblas_svecentry(pVc[0],
+      call(sblas_svecentry(pVc[0],
                                          Vl->index[z],
                                          al*Vl->val[z]));
-      if (ierr != sb_OK) return ierr;
+      
     }
   }
   
@@ -347,18 +347,18 @@ int sblas_smpm(double a, sblas_smat *A,
   
   //add rows
   for (i = 0; i < Ma->m; i++){
-    ierr = sblas_error(sblas_svpv(a, Ma->Row[i], 
+    call(sblas_svpv(a, Ma->Row[i], 
                                   b, Mb->Row[i], 
                                   &C->Row[i]));
-    if (ierr != sb_OK) return ierr;
+    
     C->nZ += C->Row[i]->nZ;
   }
   //add cols
   for (i = 0; i < Ma->n; i++){
-    ierr = sblas_error(sblas_svpv(a, Ma->Col[i], 
+    call(sblas_svpv(a, Ma->Col[i], 
                                   b, Mb->Col[i], 
                                   &C->Col[i]));
-    if (ierr != sb_OK) return ierr;
+    
   }
   
   pC[0] = C;
@@ -381,8 +381,8 @@ int sblas_cpvec(sblas_svec *a, sblas_svec **pb)
   int ierr;
   sblas_svec *b;
   
-  ierr = sblas_error(sblas_createsvec(&b, a->m));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_createsvec(&b, a->m));
+  
   
   b->nZ = a->nZ;
   b->nZprealloc = a->nZprealloc;
@@ -439,8 +439,8 @@ int sblas_svadd(double a, sblas_svec *Va, double b, sblas_svec *Vb)
     for (i = 0; i < Va->nZ; i++) {
       idx = Va->index[i];
       val = a*Va->val[i];
-      ierr = sblas_error(sblas_svecentry(Vb, idx, val));
-      if (ierr != sb_OK) return ierr;
+      call(sblas_svecentry(Vb, idx, val));
+      
     }
   
   return sb_OK;
@@ -458,5 +458,88 @@ double sblas_sv2norm(sblas_svec *Va)
   norm = sqrt(norm);
   
   return norm;
+}
+
+/* function: sblas_lu */
+/* decomposes full matrix as A = L*U*/
+int sblas_lu(int n, double *a, double *l, double *u)
+{
+  
+  int i, j, m;
+  
+  for(i = 0; i < n; i++) for(j = 0; j < n; j++) l[i*n+j] = u[i*n+j] = 0.0;
+  
+  for(i = 0; i < n; i++) l[i*n+i] = 1.0;
+  
+  for(m = 0; m < n; m++){
+    for(i = m; i < n; i++){
+      u[m*n+i] = a[m*n+i];
+      for(j = 0; j < m; j++){
+        u[m*n+i] -= l[m*n+j]*u[j*n+i];
+      }
+    }
+    for(i = m+1; i < n; i++){
+      l[i*n+m] = a[i*n+m];
+      for (j = 0; j < m; j++){
+        l[i*n+m] -= l[i*n+j]*u[j*n+m];
+      }
+      if (fabs(u[m*n+m]) < MEPS)
+        return sblas_error(sb_BREAKDOWN);
+      l[i*n+m] = l[i*n+m]/u[m*n+m];
+    }
+  }
+  
+  return sb_OK;
+}
+
+/* function: sblas_luinv */
+/* inverts L and U factors*/
+int sblas_luinv(int n, double *l, double *u, double *linv, double *uinv)
+{
+  int i, j, k;
+  double sum;
+  //Computing inverse of U
+  for(j = n-1; j >= 0; j--){
+    for(i = n-1; i >= 0; i--){
+      if(i == j) uinv[i*n+j] = 1.0/u[i*n+j];
+      else {
+        sum = 0.0;
+        for(k = n-1; k > i; k--) sum += u[i*n+k]*uinv[k*n+j];
+        uinv[i*n+j] = -sum/u[i*n+i];
+      }
+    }
+  }
+  
+  //Computing inverse of L
+  for(j = 0; j < n; j++){
+    for(i = 0; i < n; i++){
+      if(i == j) linv[i*n+j] = 1.0/l[i*n+j];
+      else {
+        sum = 0.0;
+        for(k = 0; k < i; k++) sum += l[i*n+k]*linv[k*n+j];
+        linv[i*n+j] = -sum/l[i*n+i];
+      }
+    }
+  }
+  
+  return sb_OK;
+}
+
+/* function: sblas_mxm */
+/* product of 2 full matrices*/
+int sblas_mxm(int m, int n, int l, double *a, double *b, double *c)
+{
+  int i, j, k;
+  
+  for (i = 0; i < m; i++) {
+    for (k = 0; k < l; k++) {
+      c[i*m+k] = 0.0;
+      for (j = 0; j < n; j++) {
+        c[i*m+k] += a[i*m+j]*b[j*n+k];
+      }
+    }
+  }
+  
+  return sb_OK;
 }
 

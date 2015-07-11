@@ -58,8 +58,8 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
   }
   
   //create vector
-  ierr = sblas_error(sblas_createsvec(&V,nI));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_createsvec(&V,nI));
+  
   
   rewind(fid);
   while (!feof(fid)) {
@@ -68,8 +68,8 @@ int sblas_readsvec(char *filename, sblas_svec **pV)
         //store ordered
         sscanf(buf, "%d %d %lf",&row, &col, &value);
         
-        ierr = sblas_error(sblas_svecentry(V, row-1, value));
-        if (ierr != sb_OK) return ierr;
+        call(sblas_svecentry(V, row-1, value));
+        
       }
   }
   
@@ -110,8 +110,8 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
   }
   
   //create matrix
-  ierr = sblas_error(sblas_createsmat(&M, nrow, ncol));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_createsmat(&M, nrow, ncol));
+  
   
   rewind(fid);
   while (!feof(fid)) {
@@ -119,9 +119,9 @@ int sblas_readsmat(char *filename, sblas_smat **pM)
       if (strncmp(buf, "\%", 1) != 0){
         sscanf(buf, "%d %d %lf",&row, &col, &value);
         
-        ierr = sblas_error(sblas_smatentry(M, row-1,
+        call(sblas_smatentry(M, row-1,
                                            col-1, value));
-        if (ierr != sb_OK) return ierr;
+        
       }
   }
   

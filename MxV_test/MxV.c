@@ -19,53 +19,62 @@ int main()
   sblas_smat *A, *H;
   sblas_svec *V, *B=NULL, *x;
   
-  ierr = sblas_error(sblas_readsmat("cg/H.txt", &H));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_readsmat("eddy_test/R_U_p_M.txt", &H));
   
-  ierr = sblas_error(sblas_readsvec("cg/b.txt", &B));
-  if (ierr != sb_OK) return ierr;
   
-//  ierr = sblas_error(sblas_readsvec("cg/x.txt", &x));
-//  if (ierr != sb_OK) return ierr;
+  call(sblas_readsvec("eddy_test/R.txt", &B));
+  
+  
+//  call(sblas_bjac(H, &A, 40));
+//  
+//  call(sblas_writesmatascii("eddy_test/BJac.txt", A, True));
+//  
+//  sblas_destroysmat(A);
+  
+  
+  
+  
+//  call(sblas_readsvec("cg/x.txt", &x));
+//  
   
 //  s = clock();
 //  //Matrix vector product
-//  ierr = sblas_error(sblas_smxv(1.0, A, True, V, &B));
-//  if (ierr != sb_OK) return ierr;
+//  call(sblas_smxv(1.0, A, True, V, &B));
+//  
 //  e = clock();
 //  printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);
   
   
-//  ierr = sblas_error(sblas_smxm(1.0, A, True, A, False, &H));
-//  if (ierr != sb_OK) return ierr;
+//  call(sblas_smxm(1.0, A, True, A, False, &H));
 //  
-  ierr = sblas_error(sblas_cpvec(B, &x));
-  if (ierr != sb_OK) return ierr;
+//  
+  call(sblas_cpvec(B, &x));
   
-  ierr = sblas_error(sblas_zerovec(x));
-  if (ierr != sb_OK) return ierr;
+  
+  call(sblas_zerovec(x));
+  
   
   s = clock();
-  ierr = sblas_error(sblas_qmr(H, B, x, 1e-10, 1000));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_qmr(H, B, x, 1e-10, 1000));
+  
   e = clock();
   printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);
   
   //write vector out
-  ierr = sblas_error(sblas_writesvecascii("x.txt", x));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_writesvecascii("x.txt", x));
+  
   
   //test in-place vector increment
-  ierr = sblas_error(sblas_svpv(2.3, B, 1.3, x, &V));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_svpv(2.3, B, 1.3, x, &V));
+  
   
   //test in-place vector increment
-  ierr = sblas_error(sblas_svpv(2.3, B, 1.3, x, &B));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_svpv(2.3, B, 1.3, x, &B));
+  
   
   sblas_svec *test;
-  ierr = sblas_error(sblas_svpv(1.0, B, -1.0, V, &test));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_svpv(1.0, B, -1.0, V, &test));
+  
   
   //sblas_destroysmat(A);
   sblas_destroysmat(H);

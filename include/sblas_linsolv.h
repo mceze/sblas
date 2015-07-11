@@ -11,6 +11,11 @@
 
 #include "sblas.h"
 
+/* function: sblas_bjac */
+/* buils a block-Jacobi approximation for Ainv.
+ Blocks are at most mxm */
+int sblas_bjac(sblas_smat *A, sblas_smat **pM, int m);
+
 /* function: sblas_cg */
 /* sparse matrix-vector product: Axb=c*/
 int sblas_cg(sblas_smat *A, sblas_svec *b,

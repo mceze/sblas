@@ -43,6 +43,7 @@
 #define sb_NOT_FOUND       -6
 #define sb_OUT_OF_BOUNDS   -7
 #define sb_BREAKDOWN       -8
+#define sb_LOGIC_ERROR     -9
 
 
 

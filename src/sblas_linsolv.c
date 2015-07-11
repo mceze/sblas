@@ -8,6 +8,81 @@
 
 #include "sblas.h"
 
+/* function: sblas_bjac */
+/* buils a block-Jacobi approximation for Ainv.
+ Blocks are at most mxm */
+int sblas_bjac(sblas_smat *A, sblas_smat **pM, int m)
+{
+  int ierr, t, ib, shift, i,j, n;
+  int nb;
+  double *Ab, *L, *U, *Linv, *Uinv, *Abinv;
+  
+  if (A->m != A->n) return sblas_error(sb_INPUT_ERROR);
+  
+  //memory for blocks
+  if ((Ab = malloc(m*m*sizeof(double))) == NULL)
+    return sblas_error(sb_MEMORY_ERROR);
+  if ((L = malloc(m*m*sizeof(double))) == NULL)
+    return sblas_error(sb_MEMORY_ERROR);
+  if ((U = malloc(m*m*sizeof(double))) == NULL)
+    return sblas_error(sb_MEMORY_ERROR);
+  if ((Linv = malloc(m*m*sizeof(double))) == NULL)
+    return sblas_error(sb_MEMORY_ERROR);
+  if ((Uinv = malloc(m*m*sizeof(double))) == NULL)
+    return sblas_error(sb_MEMORY_ERROR);
+  if ((Abinv = malloc(m*m*sizeof(double))) == NULL)
+    return sblas_error(sb_MEMORY_ERROR);
+  
+  //memory for preconditioner
+  call(sblas_createsmat(pM, A->m, A->n));
+  
+  //number of blocks
+  nb = floor(A->m/m);
+  //remainder block size
+  t = A->m-nb*m;
+  
+  //loop over mxm blocks and invert them
+  for (ib = 0; ib < nb+1; ib++) {
+    shift = ib*m;
+    if (ib < nb){
+      n = m;
+    }
+    else {
+      n = t;
+      if (t == 0)
+        break;
+    }
+    //build local block
+    for (i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) {
+        call(sblas_smat_getentry(A, shift+i, shift+j, &Ab[i*n+j]));
+      }
+    }
+    //compute Ab = L*U
+    call(sblas_lu(n, Ab, L, U));
+    //compute  Linv and Uinv
+    call(sblas_luinv(n, L, U, Linv, Uinv));
+    //compute Ab^(-1) = Uinv^(-1)*Linv^(-1)
+    call(sblas_mxm(n, n, n, Uinv, Linv, Abinv));
+    //put inverse in sparse matrix
+    for (i = 0; i < n; i++) {
+      for (j = 0; j < n; j++) {
+        call(sblas_smatentry((*pM), shift+i, shift+j, Abinv[i*n+j]));
+      }
+    }
+  }
+  
+  free(Ab);
+  free(Abinv);
+  free(L);
+  free(U);
+  free(Linv);
+  free(Uinv);
+  
+  
+  return sb_OK;
+}
+
 /* function: sblas_cg */
 /* Solves A*x = b, with A symmetric, positive definite, 
  using the conjugate gradient method*/
@@ -15,93 +90,75 @@ int sblas_cg(sblas_smat *A, sblas_svec *b,
                    sblas_svec *x, float const tol,
                    int const niter)
 {
-  int ierr, it, i;
-  double alpha, beta, den, num, r0, val;
-  sblas_svec *p, *r, *t, *Ap, *bm;
-  sblas_smat *M, *Am;
-  
-  //create Jacobi preconditioner
-  ierr = sblas_error(sblas_createsmat(&M, A->m, A->n));
-  if (ierr != sb_OK) return ierr;
-  for (i = 0; i < A->m; i++) {
-    ierr = sblas_error(sblas_smat_getentry(A, i, i, &val));
-    if (ierr != sb_OK) return ierr;
-    ierr = sblas_error(sblas_smatentry(M, i, i, 1.0));
-    if (ierr != sb_OK) return ierr;
-  }
-  
-  //naive preconditioner application
-  ierr = sblas_error(sblas_smxm(1.0, M, False, A, False, &Am));
-  if (ierr != sb_OK) return ierr;
-  
-  ierr = sblas_error(sblas_smxv(1.0, M, False, b, &bm, True));
-  if (ierr != sb_OK) return ierr;
+  int ierr, it;
+  double alpha, beta, den, num, r0;
+  sblas_svec *p, *r, *t, *Ap;
   
   //create search direction and residual vectors
-  ierr = sblas_error(sblas_cpvec(x, &t));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_cpvec(x, &t));
   
-  ierr = sblas_error(sblas_zerovec(t));
-  if (ierr != sb_OK) return ierr;
   
-  ierr = sblas_error(sblas_cpvec(x, &Ap));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_zerovec(t));
   
-  ierr = sblas_error(sblas_zerovec(Ap));
-  if (ierr != sb_OK) return ierr;
+  
+  call(sblas_cpvec(x, &Ap));
+  
+  
+  call(sblas_zerovec(Ap));
+  
 
   //r = b-A*x
-  ierr = sblas_error(sblas_zerovec(t));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_zerovec(t));
   
-  ierr = sblas_error(sblas_smxv(1.0, Am, False, x, &t, False));
-  if (ierr != sb_OK) return ierr;
   
-  ierr = sblas_error(sblas_svpv(1.0, bm, -1.0, t, &r));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_smxv(1.0, A, False, x, &t, False));
+  
+  
+  call(sblas_svpv(1.0, b, -1.0, t, &r));
+  
   
   //p = r
-  ierr = sblas_error(sblas_cpvec(r, &p));
-  if (ierr != sb_OK) return ierr;
+  call(sblas_cpvec(r, &p));
   
-  ierr = sblas_error(sblas_svdv(1.0, r, r, &num));
-  if (ierr != sb_OK) return ierr;
+  
+  call(sblas_svdv(1.0, r, r, &num));
+  
   
   r0 = sqrt(num);
   printf("|R0| = %1.5e\n",r0);
   
   for (it = 0; it < niter; it++) {
-    ierr = sblas_error(sblas_smxv(1.0, Am, False, p, &Ap, False));
-    if (ierr != sb_OK) return ierr;
-    ierr = sblas_error(sblas_svdv(1.0, p, Ap, &den));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_smxv(1.0, A, False, p, &Ap, False));
+    
+    call(sblas_svdv(1.0, p, Ap, &den));
+    
     
     //alpha = r^T*r/(p^T*A*p)
     alpha = num/den;
     
     //x = x+alpha*p
-    ierr = sblas_error(sblas_svadd(alpha, p, 1.0, x));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svadd(alpha, p, 1.0, x));
+    
     
     //r = r - alpha*A*p
-    ierr = sblas_error(sblas_svadd(-alpha, Ap, 1.0, r));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svadd(-alpha, Ap, 1.0, r));
+    
     
     
     den = num;
-    ierr = sblas_error(sblas_svdv(1.0, r, r, &num));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svdv(1.0, r, r, &num));
+    
     //check convergence
     if (sqrt(num) < tol) break;
     beta = num/den;
     
     printf("Iteration %d |R|/|R0| = %1.5e\n",it, sqrt(num)/r0);
     //p = r + beta*p
-    ierr = sblas_error(sblas_svadd(1.0, r, beta, p));
-    if (ierr != sb_OK) return ierr;
+    call(sblas_svadd(1.0, r, beta, p));
     
-    ierr = sblas_error(sblas_zerovec(Ap));
-    if (ierr != sb_OK) return ierr;
+    
+    call(sblas_zerovec(Ap));
+    
   }
   
   
@@ -109,10 +166,7 @@ int sblas_cg(sblas_smat *A, sblas_svec *b,
   sblas_destroysvec(t);
   sblas_destroysvec(r);
   sblas_destroysvec(Ap);
-  sblas_destroysvec(bm);
-  sblas_destroysmat(Am);
-  sblas_destroysmat(M);
-  
+    
   return sb_OK;
 }
 
@@ -129,6 +183,7 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
   sblas_svec *r, *d, *s, *rtest;
   sblas_svec *v, *w, *y, *z, *p, *q;
   sblas_svec *vtil, *wtil, *ytil, *ztil, *ptil;
+  sblas_smat *M2;
   
   //allocate memory
   call(sblas_createsvec(&r, m));
@@ -146,6 +201,9 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
   call(sblas_createsvec(&ztil, m));
   call(sblas_createsvec(&ptil, m));
   call(sblas_createsvec(&rtest, m));
+  
+  //create preconditioner
+  call(sblas_bjac(A, &M2, 40));
   
   
   //r = -A*x
@@ -165,8 +223,9 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
   
   //wtil = r
   call(sblas_svadd(1.0, r, 0.0, wtil));
-  //solve M2^T*z = wtil (for now we set M2 = I)
-  call(sblas_svadd(1.0, wtil, 0.0, z));
+  //solve M2^T*z = wtil
+  call(sblas_zerovec(z));
+  call(sblas_smxv(1.0, M2, True, wtil, &z, False));
   qsi = sblas_sv2norm(z);
   
   gamma_prev = 1.0; eta_prev = -1.0;
@@ -193,9 +252,9 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     if (fabs(delta) < MEPS)//curable
       return sblas_error(sb_BREAKDOWN);
     
-    //solve M2*ytil = y (for now we set M2 = I)
+    //solve M2*ytil = y
     call(sblas_zerovec(ytil));
-    call(sblas_svadd(1.0, y, 0.0, ytil));
+    call(sblas_smxv(1.0, M2, False, y, &ytil, False));
     //solve M1^t*ztil = z (for now we set M1 = I)
     call(sblas_zerovec(ztil));
     call(sblas_svadd(1.0, z, 0.0, ztil));
@@ -243,7 +302,7 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     call(sblas_svadd(-beta, w,1.0, wtil));
     //solve M2^t*z = wtil (for now we set M2 = I)
     call(sblas_zerovec(z));
-    call(sblas_svadd(1.0, wtil, 0.0, z));
+    call(sblas_smxv(1.0, M2, True, wtil, &z, False));
     //qsi_next = |z|
     qsi_next = sblas_sv2norm(z);
     //theta = rho_next/(gamma_prev*|beta|)
@@ -286,7 +345,8 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     call(sblas_svadd(1.0, b, 1.0, rtest));
     
     rnorm = sblas_sv2norm(rtest);
-    printf("Iteration %d |R|/|R0| = %1.15e\n",it, rnorm/rnorm0);
+    //printf("Iteration %d |R|/|R0| = %1.5e %1.5e\n",it, rnorm/rnorm0, rnorm);
+    printf("%1.5e\n",rnorm/rnorm0);
     if (rnorm/rnorm0 < tol) break;
   }
   
@@ -304,6 +364,7 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
   sblas_destroysvec(ytil);
   sblas_destroysvec(ztil);
   sblas_destroysvec(rtest);
+  sblas_destroysmat(M2);
   
   return sb_OK;
 }

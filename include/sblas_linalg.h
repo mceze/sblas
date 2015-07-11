@@ -65,6 +65,19 @@ int sblas_svadd(double a, sblas_svec *Va, double b,
 /* vector 2-norm */
 double sblas_sv2norm(sblas_svec *Va);
 
+/* function: sblas_lu */
+/* decomposes full matrix as A = L*U*/
+int sblas_lu(int n, double *a, double *l, double *u);
+
+/* function: sblas_luinv */
+/* inverts L and U factors*/
+int sblas_luinv(int n, double *l, double *u, double *linv, double *uinv);
+
+/* function: sblas_mxm */
+/* product of 2 full matrices*/
+int sblas_mxm(int m, int n, int l, double *a, double *b, double *c);
+
+
 #endif
 
 
