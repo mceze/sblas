@@ -25,6 +25,6 @@ int sblas_cg(sblas_smat *A, sblas_svec *b,
 /* Solves A*x = b, using the Quasi-Minimal Residual method*/
 int sblas_qmr(sblas_smat *A, sblas_svec *b,
               sblas_svec *x, float const tol,
-              int const niter);
+              int const niter, sblas_smat **pM2);
 
 #endif /* defined(__sblas__sblas_linsolv__) */

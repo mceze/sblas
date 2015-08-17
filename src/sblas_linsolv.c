@@ -174,12 +174,12 @@ int sblas_cg(sblas_smat *A, sblas_svec *b,
 /* Solves A*x = b, using the Quasi-Minimal Residual method*/
 int sblas_qmr(sblas_smat *A, sblas_svec *b,
               sblas_svec *x, float const tol,
-              int const niter)
+              int const niter, sblas_smat **pM2)
 {
   int ierr, it, m = b->m;
   double rho, qsi, gamma, eta, delta, eps, beta, theta;
   double theta_prev, gamma_prev, eta_prev, rho_next, qsi_next;
-  double rnorm0,rnorm;
+  double rnorm0,rnorm, rnormtrue;
   sblas_svec *r, *d, *s, *rtest;
   sblas_svec *v, *w, *y, *z, *p, *q;
   sblas_svec *vtil, *wtil, *ytil, *ztil, *ptil;
@@ -203,8 +203,13 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
   call(sblas_createsvec(&rtest, m));
   
   //create preconditioner
-  call(sblas_bjac(A, &M2, 40));
-  
+  if ((*pM2) == NULL){
+    call(sblas_bjac(A, &M2, 40));
+    (*pM2) = M2;
+  }
+  else {
+    M2 = (*pM2);
+  }
   
   //r = -A*x
   //calculate residual and compute its initial value
@@ -256,15 +261,12 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     call(sblas_zerovec(ytil));
     call(sblas_smxv(1.0, M2, False, y, &ytil, False));
     //solve M1^t*ztil = z (for now we set M1 = I)
-    call(sblas_zerovec(ztil));
     call(sblas_svadd(1.0, z, 0.0, ztil));
     
     //compute p and q
     if (it == 0) {
-      call(sblas_zerovec(p));
       //p = ytil
       call(sblas_svadd(1.0, ytil, 0.0, p));
-      call(sblas_zerovec(q));
       //q = ztil
       call(sblas_svadd(1.0, ztil, 0.0, q));
     }
@@ -287,11 +289,9 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     if (fabs(beta) < MEPS)
       return sblas_error(sb_BREAKDOWN);
     //vtil = ptil-beta*v
-    call(sblas_zerovec(vtil));
     call(sblas_svadd(1.0, ptil,0.0, vtil));
     call(sblas_svadd(-beta,v,1.0, vtil));
     //solve M1*y = vtil (for now we set M1 = I)
-    call(sblas_zerovec(y));
     call(sblas_svadd(1.0, vtil, 0.0, y));
     //rho_next = |y|
     rho_next = sblas_sv2norm(y);
@@ -316,10 +316,8 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     
     if (it == 0){
       //d = eta*p
-      call(sblas_zerovec(d));
       call(sblas_svadd(eta, p, 0.0, d));
       //s = eta*ptil
-      call(sblas_zerovec(s));
       call(sblas_svadd(eta, ptil, 0.0, s));
     }
     else {
@@ -332,11 +330,8 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     call(sblas_svadd(1.0, d, 1.0, x));
     //r = r-s
     call(sblas_svadd(-1.0, s, 1.0, r));
-    theta_prev  = theta;
-    gamma_prev  = gamma;
-    eta_prev    = eta;
-    rho         = rho_next;
-    qsi         = qsi_next;
+    
+    rnorm = sblas_sv2norm(r);
     
     //TEMPORARY
     call(sblas_zerovec(rtest));
@@ -344,10 +339,16 @@ int sblas_qmr(sblas_smat *A, sblas_svec *b,
     //r += b
     call(sblas_svadd(1.0, b, 1.0, rtest));
     
-    rnorm = sblas_sv2norm(rtest);
-    //printf("Iteration %d |R|/|R0| = %1.5e %1.5e\n",it, rnorm/rnorm0, rnorm);
-    printf("%1.5e\n",rnorm/rnorm0);
+    rnormtrue = sblas_sv2norm(rtest);
+    printf("Iteration %d |R| = %1.5e/%1.5e \n",it, rnorm, rnormtrue);
+    //printf("%1.5e\n",rnorm/rnorm0);
     if (rnorm/rnorm0 < tol) break;
+    
+    theta_prev  = theta;
+    gamma_prev  = gamma;
+    eta_prev    = eta;
+    rho         = rho_next;
+    qsi         = qsi_next;
   }
   
   //release memory
