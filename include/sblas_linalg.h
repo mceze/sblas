@@ -77,6 +77,10 @@ int sblas_luinv(int n, double *l, double *u, double *linv, double *uinv);
 /* product of 2 full matrices*/
 int sblas_mxm(int m, int n, int l, double *a, double *b, double *c);
 
+/* function: sblas_svechad */
+/* Hadamard (entrywise) product of 2 sparse vectors */
+int sblas_svechad(sblas_svec *a, sblas_svec *b,
+                  enum sblas_bool invflag, sblas_svec **pc);
 
 #endif
 

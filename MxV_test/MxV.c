@@ -14,48 +14,48 @@
 
 int main()
 {
-  int ierr;
-  double s,e;
-  sblas_smat *A, *H;
-  sblas_svec *V, *B=NULL, *x;
+  int ierr, i;
+  double s,e, qsi;
+  sblas_smat *M, *A, *P1=NULL, *P2=NULL, *AM = NULL, *P =  NULL;
+  sblas_svec *b=NULL, *x = NULL, *V = NULL;
   
-  call(sblas_readsmat("eddy_test/R_U_p_M.txt", &H));
+  //build Block-Jacobi preconditioner with Jacobian only
+//  call(sblas_readsmat("eddy_test/R_U.txt", &M));
+//  call(sblas_bjac(M, &M2, 40));
+//  sblas_destroysmat(M);
   
-  
-  call(sblas_readsvec("eddy_test/R.txt", &B));
-  
-  
-//  call(sblas_bjac(H, &A, 40));
+  //R_U
+  call(sblas_readsmat("dRdU_p_lA0.txt", &A));
+  call(sblas_readsmat("P.txt", &P));
+//  //M
+//  call(sblas_readsmat("eddy_test/matrix_bkp/naca_n2/M.txt", &M));
 //  
-//  call(sblas_writesmatascii("eddy_test/BJac.txt", A, True));
+//  //build Block-Jacobi preconditioner for R_U
+//  call(sblas_bjac(A, &P1, 40));
+//
+//  //build Block-Jacobi preconditioner for M
+//  call(sblas_bjac(M, &P2, 40));
 //  
-//  sblas_destroysmat(A);
+//  //combine matrices
+//  call(sblas_smpm(1.0, A, False, 5000.0, M, False, &AM));
+//  //combine preconditioners
+//  //call(sblas_smpm(1.0, P1, False, 5000.0, P2, False, &P));
+//  call(sblas_bjac(AM, &P, 40));
   
   
+//  //no preconditioner
+//  call(sblas_createsmat(&M2, A->m, A->n));
+//  for (i = 0; i < M2->m; i++) {
+//    call(sblas_smatentry(M2, i, i, 1.0));
+//  }
   
+  call(sblas_readsvec("R.txt", &b));
   
-//  call(sblas_readsvec("cg/x.txt", &x));
-//  
-  
-//  s = clock();
-//  //Matrix vector product
-//  call(sblas_smxv(1.0, A, True, V, &B));
-//  
-//  e = clock();
-//  printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);
-  
-  
-//  call(sblas_smxm(1.0, A, True, A, False, &H));
-//  
-//  
-  call(sblas_cpvec(B, &x));
-  
-  
+  call(sblas_createsvec(&x, b->m));
   call(sblas_zerovec(x));
   
-  
   s = clock();
-  call(sblas_qmr(H, B, x, 1e-10, 1000));
+  call(sblas_qmr(A, b, x, 1e-15, 200, &P));
   
   e = clock();
   printf("time: %1.3e\n",(e-s)/CLOCKS_PER_SEC);
@@ -63,24 +63,12 @@ int main()
   //write vector out
   call(sblas_writesvecascii("x.txt", x));
   
-  
-  //test in-place vector increment
-  call(sblas_svpv(2.3, B, 1.3, x, &V));
-  
-  
-  //test in-place vector increment
-  call(sblas_svpv(2.3, B, 1.3, x, &B));
-  
-  
-  sblas_svec *test;
-  call(sblas_svpv(1.0, B, -1.0, V, &test));
-  
-  
-  //sblas_destroysmat(A);
-  sblas_destroysmat(H);
-  sblas_destroysvec(V);
-  sblas_destroysvec(test);
-  sblas_destroysvec(B);
+  sblas_destroysmat(A);
+  sblas_destroysmat(M);
+  sblas_destroysmat(AM);
+  sblas_destroysmat(P1);
+  sblas_destroysmat(P2);
+  sblas_destroysvec(b);
   sblas_destroysvec(x);
   
   

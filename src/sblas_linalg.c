@@ -543,3 +543,26 @@ int sblas_mxm(int m, int n, int l, double *a, double *b, double *c)
   return sb_OK;
 }
 
+/* function: sblas_svechad */
+/* Hadamard (entrywise) product of 2 sparse vectors */
+int sblas_svechad(sblas_svec *a, sblas_svec *b,
+                  enum sblas_bool invflag, sblas_svec **pc)
+{
+  int ierr, i, ai;
+  double v;
+  
+  if (a->m != b->m) return sblas_error(sb_INCOMPATIBLE);
+  
+  call(sblas_createsvec(pc, a->m));
+  
+  for (i = 0; i < a->nZ; i++) {
+    ai = a->index[i];
+    call(sblas_svec_getentry(b, ai, &v));
+    if(invflag)
+      v = 1.0/v;
+    call(sblas_svecentry((*pc), ai, a->val[i]*v));
+  }
+  
+  return sb_OK;
+}
+
